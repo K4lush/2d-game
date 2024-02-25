@@ -11,7 +11,7 @@ class TextInput:
         self.color = WHITE
         self.text = initial_string
         self.color = BLACK  # Set the text color
-        self.font = pygame.font.Font(None, 16)
+        self.font = pygame.font.Font(None, 50)
         self.txt_surface = self.font.render(initial_string, True, (255, 255, 255))  # Initialize here
         self.active = False
 
@@ -27,7 +27,7 @@ class TextInput:
             self.txt_surface = self.font.render(self.text, True, self.color)
     def draw(self, screen):
         # Blit the rect.
-        pygame.draw.rect(screen, self.color, self.rect, 2)
+        # pygame.draw.rect(screen, self.color, self.rect, 2)
         # Blit the text.
         screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
 

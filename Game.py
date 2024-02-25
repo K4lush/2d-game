@@ -1,7 +1,7 @@
 from enum import Enum
 import pygame
 
-from MainMenuScreen import MainMenuScreen
+# from JoinGameScreen import MainMenuScreen
 from SelectCharacter import SelectCharacter
 
 class GameState(Enum):

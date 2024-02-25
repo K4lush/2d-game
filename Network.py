@@ -6,13 +6,10 @@ class Network:
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # self.server = "172.20.10.12"
         # self.port = 12345
-
         self.server = ip
         self.port = port
         self.addr = (self.server, self.port)
         self.connect = self.connect()
-        # self.client_id = self.get_client_id()
-
 
     def connect(self):
         try:
@@ -48,4 +45,3 @@ class Network:
         except Exception as e:
             print(f"General Error: {e}")
         return None
-

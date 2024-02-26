@@ -1,13 +1,15 @@
 import pickle
 import socket
-import pygame  
+
 from _thread import start_new_thread
 import threading
-from objects import stillObjects
+
+
+from PlatformObjects import StillObjects
 from Player import Player
 from Settings import Settings
-import time
-from Lava import Lava
+from MapServer import MapServer
+
 from Rope import Rope
 
 class ClientHandler:
@@ -19,12 +21,11 @@ class ClientHandler:
         self.server = server
         self.connected = True
         self.ready = False
-        self.platforms_sent = False
         self.id = ClientHandler.client_count
         ClientHandler.client_count += 1
 
     def add_player(self, id, character_name):
-        player = Player(id, character_name, 'idle', 'right', (200 if id == 0 else 100), 200, 50, 50,
+        player = Player(id, character_name, 'idle', 'right', (200 if id == 0 else 100), 300, 50, 50,
                         (255, 0, 255 if id == 0 else 255, 200, 255))
         self.server.players.append(player)
 
@@ -33,9 +34,6 @@ class ClientHandler:
 
     def game(self):
         try:
-            # # Send objects that needs to be sent once.
-            # self.server.broadcast_platforms(self.client)
-
             print("ENTERING FOR CLIENT TO BE READY")
             self.wait_until_ready()
 
@@ -54,7 +52,6 @@ class ClientHandler:
         print("Server reached this point")
         while not self.ready:
             data = self.server.receive_from_client_state(self)
-            print(data)
 
             state = data['state']
             character = data['character']
@@ -69,15 +66,11 @@ class ClientHandler:
         print(self.server.players_ready_state)
         while not all(self.server.players_ready_state):
             self.server.broadcast_state_to_client(self.client, "NOT READY")
-            # time.sleep(0.4)
         self.server.broadcast_state_to_client(self.client, "READY")
-        # time.sleep(0.5)
 
     def game_loop(self):
         while self.connected:
             self.server.broadcast_to_client(self.client)
-            # if self.server.rope_created:
-            #     self.server.rope.update()
             self.server.receive_from_client_update(self)
 
     def disconnect(self):
@@ -91,14 +84,17 @@ class Server:
         self.port = port
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.lock = threading.Lock()
+        self.settings = MapServer()
         self.client_handlers = []
         self.players_ready_state = [None, None]
         self.pressed_keys = {}  # In your server class
 
         ### Move to setting class ###
+        self.platforms_sent = False
         self.rope_created = False
         self.rope = None
         self.players = []
+
 
     def start_server(self):
         self.server.bind((self.host, self.port))
@@ -129,8 +125,10 @@ class Server:
     def broadcast_to_client(self, client):
         gameState = {
             'Players': self.players,
-            'Rope': self.rope
+            'Rope': self.rope,
+            'Terrain': None  # Terrain should be sent only once
         }
+
         data = pickle.dumps(gameState)
         client.sendall(data)
 
@@ -138,14 +136,9 @@ class Server:
         state = pickle.dumps(data)
         client.sendall(state)
 
-    def broadcast_platforms(self, client):
-        data = pickle.dumps(self.platforms)
-        client.sendall(data)
-
     def receive_from_client_update(self, obj):
         data = pickle.loads(obj.client.recv(4096))
         if data:
-            #print(f"Received data from client {obj.id}: {data}")
             # Update game objects based on received data
             # This is where you would update player positions, etc.
             self.update_objects(obj.id, data)
@@ -176,19 +169,22 @@ class Server:
                 player.action = 'run'
                 player.direction = 'right'  # Add direction attribute
 
+            print("PLAYER: Ground Flag ", player.on_ground)
+
             if "up" in self.pressed_keys[client_id]:  # Check if 'up' is being held down
                 player.jump()
+                player.action = 'run'
 
             # 3. Apply Gravity (conditionally)
-            player.apply_gravity()
+            if not player.on_ground:
+                player.apply_gravity()
 
             # 4. Handle Collisions
-            player.handle_collisions()  # Assuming you have a list of platforms
+            player.handle_collisions(self.settings.terrain)  # Assuming you have a list of platforms
 
             # 5. Update Rope (if it exists)
             if self.rope:
                 self.rope.update()
-
 
 
     def find_player_by_id(self, client_id):

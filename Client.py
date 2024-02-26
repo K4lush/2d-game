@@ -18,10 +18,11 @@ class Client:
         self.screen = pygame.display.set_mode((800, 600))  # Example screen size
         self.network = None
         self.join_menu = JoinGameScreen(self)
-        self.current_state = 'JOIN MENU'
         self.main_menu = MainMenuScreen()
         self.loading_screen = LoadingScreen()
         self.game_logic = GameLogicScreen()
+        self.static_objects_received = False
+        self.current_state = 'JOIN MENU'
 
     def run(self):
         while True:
@@ -51,7 +52,6 @@ class Client:
                 # Update the server the current state
                 self.sendToServer(data)
                 self.current_state = 'PLAYING'
-
 
         # elif self.current_state == "LOADING SCREEN":
         #     new_state = self.loading_screen.update(self.network)

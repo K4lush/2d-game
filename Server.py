@@ -9,6 +9,7 @@ from PlatformObjects import StillObjects
 from Player import Player
 from Settings import Settings
 from MapServer import MapServer
+from Lava import Lava
 
 from Rope import Rope
 
@@ -94,6 +95,8 @@ class Server:
         self.rope_created = False
         self.rope = None
         self.players = []
+        self.lavaBlocks = []
+        self.CreateLava()
 
 
     def start_server(self):
@@ -106,6 +109,13 @@ class Server:
             client_handler = ClientHandler(client, addr, self)
             self.add_client_handler(client_handler)  # Use the new method to add client handlers
             start_new_thread(client_handler.game, ())
+
+    def CreateLava(self):
+        for i in range(20):
+                ##each lava width is 48 pixels, so draw every 48 pixels accross screen. 
+                ## we want to draw them 64*however many blocks depths we have in self.map in order for the lava to spawn at bottom of map
+                lava = Lava(i,i*48, 500, 48, 48)
+                self.lavaBlocks.append(lava)
 
     def create_rope_if_needed(self):
         if len(self.players) == 2 and not self.rope_created:
@@ -126,7 +136,7 @@ class Server:
         gameState = {
             'Players': self.players,
             'Rope': self.rope,
-            'Terrain': None  # Terrain should be sent only once
+            'Lava':self.lavaBlocks
         }
 
         data = pickle.dumps(gameState)

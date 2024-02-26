@@ -19,34 +19,65 @@ class Settings:
 
         self.platforms = []
         self.player_sprites = {}
-        self.player_sprites = {}
+        self.lava_sprites = {}
         self.create_blocks_from_map()
         self.character_sprites = self.load_characters_sprites()
+        self.lavaAnimationFrames = self.load_lava_animations()
+
+    def load_lava_animations(self):
+        lava_sheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
+        frame_width = 16
+        frame_height = 16
+        num_frames = 4
+        frame_offsets = [i * (frame_width + 1) for i in range(num_frames)]
+
+        lava_frames = []
+        for offset in frame_offsets:
+            frame = lava_sheet.subsurface((offset, 0, frame_width, frame_height))
+            scaled_frame = pygame.transform.scale(frame, (frame_width * 3, frame_height * 3))  # Scale frame by a factor of 3
+            lava_frames.append(scaled_frame)
+
+        
+
+        return lava_frames
+    
+    def updateLavaSprites(self, lavaBlocks):
+        #lava id as key animated sprite instance as value
+        for lava in lavaBlocks:
+            sprite_key = f'{lava.id}'
+
+            if sprite_key not in self.lava_sprites:
+                frames = self.lavaAnimationFrames
+                self.lava_sprites[sprite_key] = AnimatedSprite(frames, frame_rate=50)
+            sprite = self.lava_sprites[sprite_key]
+            
+            sprite.update()
+    
 
     def load_characters_sprites(self):
         characters = {
             'NinjaFrog': {
                 'idle': self.load_animation_frames('NinjaFrog', 'idle', 11),
                 'run': self.load_animation_frames('NinjaFrog', 'run', 12),
-                'died': self.load_animation_frames('NinjaFrog', 'died', 7),
+                #'died': self.load_animation_frames('NinjaFrog', 'died', 7),
                 # Add more animations for NinjaFrog as needed
             },
             'MaskDude': {
                 'idle': self.load_animation_frames('MaskDude', 'idle', 11),
                 'run': self.load_animation_frames('MaskDude', 'run', 12),
-                'died': self.load_animation_frames('MaskDude', 'died', 7),
+                #'died': self.load_animation_frames('MaskDude', 'died', 7),
                 # Add more animations for MaskDude as needed
             },
             'PinkMan': {
                 'idle': self.load_animation_frames('PinkMan', 'idle', 11),
                 'run': self.load_animation_frames('PinkMan', 'run', 12),
-                # 'died': self.load_animation_frames('PinkMan', 'died', 7),
+                #'died': self.load_animation_frames('PinkMan', 'died', 7),
                 # Add more animations for NinjaFrog as needed
             },
             'VirtualGuy': {
                 'idle': self.load_animation_frames('VirtualGuy', 'idle', 11),
                 'run': self.load_animation_frames('VirtualGuy', 'run', 12),
-                # 'died': self.load_animation_frames('VirtualGuy', 'died', 7),
+                #'died': self.load_animation_frames('VirtualGuy', 'died', 7),
                 # Add more animations for MaskDude as needed
             }
             # Add more characters as needed
@@ -68,7 +99,6 @@ class Settings:
             frames.append(scaled_frame)
 
         return frames
-
 
     def update_player_sprite(self, players):
 

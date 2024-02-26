@@ -10,6 +10,7 @@ class GameLogicScreen:
         self.settings = Settings()
         self.players = None
         self.rope = None
+        self.lavaBlocks = []
 
     def handle_event(self, keys):
         pressed_keys = []
@@ -35,8 +36,11 @@ class GameLogicScreen:
 
         self.players = data['Players']
         self.rope = data['Rope']
+        if 'Lava' in data:
+            self.lavaBlocks = data['Lava']
 
         self.settings.update_player_sprite(self.players)
+        self.settings.updateLavaSprites(self.lavaBlocks)
 
     def render(self, screen):
         for block in self.settings.platforms:
@@ -52,6 +56,14 @@ class GameLogicScreen:
                     sprite.draw(screen, (player.x, player.y))
         if self.rope:
             self.rope.draw(screen)
+        if self.lavaBlocks:
+            for lava in self.lavaBlocks:
+                sprite_key = f'{lava.id}'
+                if sprite_key in self.settings.lava_sprites:
+                    sprite = self.settings.lava_sprites[sprite_key]
+                    sprite.draw(screen, (lava.x, lava.y))
+
+                
 
 
 

@@ -96,9 +96,7 @@ class Server:
         self.rope = None
         self.players = []
         self.lavaBlocks = []
-        self.BiglavaBlock = None
         self.CreateLava()
-        self.CreateBigLavaBlock()
 
 
     def start_server(self):
@@ -112,14 +110,11 @@ class Server:
             self.add_client_handler(client_handler)  # Use the new method to add client handlers
             start_new_thread(client_handler.game, ())
 
-    def CreateBigLavaBlock(self):
-        self.BiglavaBlock = Lava(99, 0, 848, 1000, 1000)
-        
     def CreateLava(self):
         for i in range(20):
                 ##each lava width is 48 pixels, so draw every 48 pixels accross screen. 
                 ## we want to draw them 64*however many blocks depths we have in self.map in order for the lava to spawn at bottom of map
-                lava = Lava(i,i*48, 800, 48, 48)
+                lava = Lava(i,i*48, 500, 48, 48)
                 self.lavaBlocks.append(lava)
 
     def create_rope_if_needed(self):
@@ -137,13 +132,11 @@ class Server:
                 self.client_handlers.remove(client_handler)
                 print(f"Client {client_handler.address} disconnected")
 
-
     def broadcast_to_client(self, client):
         gameState = {
             'Players': self.players,
             'Rope': self.rope,
-            'Lava':self.lavaBlocks,
-            'LavaBlock':self.BiglavaBlock
+            'Lava':self.lavaBlocks
         }
 
         data = pickle.dumps(gameState)
@@ -199,14 +192,9 @@ class Server:
             # 4. Handle Collisions
             player.handle_collisions(self.settings.terrain)  # Assuming you have a list of platforms
 
-
             # 5. Update Rope (if it exists)
             if self.rope:
                 self.rope.update()
-
-            for lava in self.lavaBlocks:
-                lava.update()
-            self.BiglavaBlock.update()
 
 
     def find_player_by_id(self, client_id):

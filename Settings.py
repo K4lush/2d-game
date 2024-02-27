@@ -23,13 +23,6 @@ class Settings:
         self.create_blocks_from_map()
         self.character_sprites = self.load_characters_sprites()
         self.lavaAnimationFrames = self.load_lava_animations()
-        self.lavaBlockSprite = self.loadLavaBlockSprite()
-
-    def loadLavaBlockSprite(self):
-        lavaSheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
-        frame1 = lavaSheet.subsurface((0, 221, 16, 16))
-        frame1_scaled = pygame.transform.scale(frame1, (1000, 1000))
-        return frame1_scaled
 
     def load_lava_animations(self):
         lava_sheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
@@ -59,19 +52,6 @@ class Settings:
             sprite = self.lava_sprites[sprite_key]
             
             sprite.update()
-            
-
-    def updateLavaBlock(self,lavaBlock):
-        
-        spriteKey = lavaBlock.id
-        if spriteKey not in self.lava_sprites:
-            frames = []
-            frames.append(self.lavaBlockSprite)
-            
-            self.lava_sprites[spriteKey] = AnimatedSprite(frames, frame_rate=50)
-        
-
-        
     
 
     def load_characters_sprites(self):
@@ -179,7 +159,7 @@ class Settings:
                 # block_sprite = block_sprites[block.id]
                 block_sprite = pygame.transform.scale(block_sprites[block.id], (block.width, block.height))
                 block.sprite = block_sprite
-                #block.sprite.rect = block.sprite.image.get_rect(topleft=(block.x, block.y))
+                # block.sprite.rect = block.sprite.image.get_rect(topleft=(block.x, block.y))
 
     def load_block_sprites(self):
         """Loads sprites for different block types."""

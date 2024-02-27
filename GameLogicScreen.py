@@ -1,6 +1,6 @@
 import pygame
 import pickle
-from Lava import Lava
+
 from Settings import Settings
 
 # from AnimatedSprite import AnimatedSprite
@@ -11,8 +11,6 @@ class GameLogicScreen:
         self.players = None
         self.rope = None
         self.lavaBlocks = []
-        self.BigLavaBlock = None
-        
 
     def handle_event(self, keys):
         pressed_keys = []
@@ -40,15 +38,9 @@ class GameLogicScreen:
         self.rope = data['Rope']
         if 'Lava' in data:
             self.lavaBlocks = data['Lava']
-        if 'LavaBlock' in data:
-            self.BigLavaBlock = data['LavaBlock']
-            
-            print(self.BigLavaBlock)
-            self.settings.updateLavaBlock(self.BigLavaBlock)
 
         self.settings.update_player_sprite(self.players)
         self.settings.updateLavaSprites(self.lavaBlocks)
-        
 
     def render(self, screen):
         for block in self.settings.platforms:
@@ -70,13 +62,6 @@ class GameLogicScreen:
                 if sprite_key in self.settings.lava_sprites:
                     sprite = self.settings.lava_sprites[sprite_key]
                     sprite.draw(screen, (lava.x, lava.y))
-        if self.BigLavaBlock is not None:
-            key = self.BigLavaBlock.id
-            if key in self.settings.lava_sprites:
-                    sprite = self.settings.lava_sprites[key]
-                    sprite.draw(screen, (self.BigLavaBlock.x, self.BigLavaBlock.y))
-                    print("It should be drawn")
-            
 
                 
 

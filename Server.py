@@ -4,7 +4,6 @@ import socket
 from _thread import start_new_thread
 import threading
 
-
 from PlatformObjects import StillObjects
 from Player import Player
 from Settings import Settings
@@ -12,6 +11,7 @@ from MapServer import MapServer
 from Lava import Lava
 
 from Rope import Rope
+
 
 class ClientHandler:
     client_count = 0  # Class variable to keep track of the number of connected clients
@@ -41,7 +41,6 @@ class ClientHandler:
             # print("WAITING FOR BOTH  CLIENTS TO BE READY")
             # self.wait_until_all_ready()
 
-
             print("ENTERING GAME LOOP")
             self.game_loop()
         except Exception as e:
@@ -62,7 +61,6 @@ class ClientHandler:
                 self.ready = True
                 self.server.players_ready_state[self.id] = True
 
-
     def wait_until_all_ready(self):
         print(self.server.players_ready_state)
         while not all(self.server.players_ready_state):
@@ -78,6 +76,7 @@ class ClientHandler:
         self.connected = False
         self.server.remove_client_handler(self)
         self.client.close()  # Ensure the socket is closed to free up resources
+
 
 class Server:
     def __init__(self, host="0.0.0.0", port=5555):
@@ -96,8 +95,9 @@ class Server:
         self.rope = None
         self.players = []
         self.lavaBlocks = []
+        self.BiglavaBlock = None
         self.CreateLava()
-
+        self.CreateBigLavaBlock()
 
     def start_server(self):
         self.server.bind((self.host, self.port))
@@ -110,12 +110,15 @@ class Server:
             self.add_client_handler(client_handler)  # Use the new method to add client handlers
             start_new_thread(client_handler.game, ())
 
+    def CreateBigLavaBlock(self):
+        self.BiglavaBlock = Lava(99, 0, 848, 1000, 1000)
+
     def CreateLava(self):
         for i in range(20):
-                ##each lava width is 48 pixels, so draw every 48 pixels accross screen. 
-                ## we want to draw them 64*however many blocks depths we have in self.map in order for the lava to spawn at bottom of map
-                lava = Lava(i,i*48, 500, 48, 48)
-                self.lavaBlocks.append(lava)
+            ##each lava width is 48 pixels, so draw every 48 pixels accross screen.
+            ## we want to draw them 64*however many blocks depths we have in self.map in order for the lava to spawn at bottom of map
+            lava = Lava(i, i * 48, 800, 48, 48)
+            self.lavaBlocks.append(lava)
 
     def create_rope_if_needed(self):
         if len(self.players) == 2 and not self.rope_created:
@@ -136,7 +139,8 @@ class Server:
         gameState = {
             'Players': self.players,
             'Rope': self.rope,
-            'Lava':self.lavaBlocks
+            'Lava': self.lavaBlocks,
+            'LavaBlock': self.BiglavaBlock
         }
 
         data = pickle.dumps(gameState)
@@ -196,12 +200,16 @@ class Server:
             if self.rope:
                 self.rope.update()
 
+            for lava in self.lavaBlocks:
+                lava.update()
+            self.BiglavaBlock.update()
 
     def find_player_by_id(self, client_id):
         for player in self.players:
             if player.id == client_id:
                 return player
         return None  # Return None if no matching player is found
+
 
 if __name__ == '__main__':
     print("This is correct server file")

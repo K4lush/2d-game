@@ -3,6 +3,7 @@ import pygame
 from AnimatedSprite import AnimatedSprite
 from PlatformObjects import StillObjects
 
+
 class Settings:
     def __init__(self):
         self.map = [
@@ -15,7 +16,7 @@ class Settings:
             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            ]
+        ]
 
         self.platforms = []
         self.player_sprites = {}
@@ -23,6 +24,13 @@ class Settings:
         self.create_blocks_from_map()
         self.character_sprites = self.load_characters_sprites()
         self.lavaAnimationFrames = self.load_lava_animations()
+        self.lavaBlockSprite = self.loadLavaBlockSprite()
+
+    def loadLavaBlockSprite(self):
+        lavaSheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
+        frame1 = lavaSheet.subsurface((0, 221, 16, 16))
+        frame1_scaled = pygame.transform.scale(frame1, (1000, 1000))
+        return frame1_scaled
 
     def load_lava_animations(self):
         lava_sheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
@@ -34,15 +42,14 @@ class Settings:
         lava_frames = []
         for offset in frame_offsets:
             frame = lava_sheet.subsurface((offset, 0, frame_width, frame_height))
-            scaled_frame = pygame.transform.scale(frame, (frame_width * 3, frame_height * 3))  # Scale frame by a factor of 3
+            scaled_frame = pygame.transform.scale(frame,
+                                                  (frame_width * 3, frame_height * 3))  # Scale frame by a factor of 3
             lava_frames.append(scaled_frame)
 
-        
-
         return lava_frames
-    
+
     def updateLavaSprites(self, lavaBlocks):
-        #lava id as key animated sprite instance as value
+        # lava id as key animated sprite instance as value
         for lava in lavaBlocks:
             sprite_key = f'{lava.id}'
 
@@ -50,34 +57,42 @@ class Settings:
                 frames = self.lavaAnimationFrames
                 self.lava_sprites[sprite_key] = AnimatedSprite(frames, frame_rate=50)
             sprite = self.lava_sprites[sprite_key]
-            
+
             sprite.update()
-    
+
+    def updateLavaBlock(self, lavaBlock):
+
+        spriteKey = lavaBlock.id
+        if spriteKey not in self.lava_sprites:
+            frames = []
+            frames.append(self.lavaBlockSprite)
+
+            self.lava_sprites[spriteKey] = AnimatedSprite(frames, frame_rate=50)
 
     def load_characters_sprites(self):
         characters = {
             'NinjaFrog': {
                 'idle': self.load_animation_frames('NinjaFrog', 'idle', 11),
                 'run': self.load_animation_frames('NinjaFrog', 'run', 12),
-                #'died': self.load_animation_frames('NinjaFrog', 'died', 7),
+                # 'died': self.load_animation_frames('NinjaFrog', 'died', 7),
                 # Add more animations for NinjaFrog as needed
             },
             'MaskDude': {
                 'idle': self.load_animation_frames('MaskDude', 'idle', 11),
                 'run': self.load_animation_frames('MaskDude', 'run', 12),
-                #'died': self.load_animation_frames('MaskDude', 'died', 7),
+                # 'died': self.load_animation_frames('MaskDude', 'died', 7),
                 # Add more animations for MaskDude as needed
             },
             'PinkMan': {
                 'idle': self.load_animation_frames('PinkMan', 'idle', 11),
                 'run': self.load_animation_frames('PinkMan', 'run', 12),
-                #'died': self.load_animation_frames('PinkMan', 'died', 7),
+                # 'died': self.load_animation_frames('PinkMan', 'died', 7),
                 # Add more animations for NinjaFrog as needed
             },
             'VirtualGuy': {
                 'idle': self.load_animation_frames('VirtualGuy', 'idle', 11),
                 'run': self.load_animation_frames('VirtualGuy', 'run', 12),
-                #'died': self.load_animation_frames('VirtualGuy', 'died', 7),
+                # 'died': self.load_animation_frames('VirtualGuy', 'died', 7),
                 # Add more animations for MaskDude as needed
             }
             # Add more characters as needed
@@ -95,7 +110,7 @@ class Settings:
         for i in range(num_frames):
             frame = sprite_sheet.subsurface((i * frame_width, 0, frame_width, frame_height))
             scaled_frame = pygame.transform.scale(frame, (
-            frame_width * scale_factor, frame_height * scale_factor))  # Scale frame
+                frame_width * scale_factor, frame_height * scale_factor))  # Scale frame
             frames.append(scaled_frame)
 
         return frames
@@ -143,7 +158,7 @@ class Settings:
         # Assuming self.settings.map is a 2D list indicating the type of tile at each position
         for row_index, row in enumerate(self.map):
             for col_index, tile_type in enumerate(row):
-                print("PLATFORMS: ",tile_type)
+                print("PLATFORMS: ", tile_type)
                 x = col_index * tile_size
                 y = row_index * tile_size
                 block = StillObjects(tile_type, x, y, tile_size, tile_size, sprite=None)

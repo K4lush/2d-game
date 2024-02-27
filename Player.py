@@ -45,6 +45,9 @@ class Player:
                 self.jump_velocity = 0  # Stop falling when you hit the ground
             self.update_rect()  # Update rect after changing y-position
 
+    def handleLavaCollisions(self,lavaBLocks):
+        pass
+
     def move_left(self):
         self.x -= self.speed
         self.update_rect()

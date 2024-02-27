@@ -19,3 +19,5 @@ class Lava(pygame.sprite.Sprite):
         if not self.NoCollision:
             self.y -= 0.2
         self.rect.y = self.y
+
+    

@@ -14,7 +14,7 @@ class Settings:
             [1, 1, 1, 1, 1, 1, 1, ],
             [-1, -1, -1, -1, -1, -1, -1, ]
         ]
-#H
+
         self.platforms = []
         self.player_sprites = {}
         self.lava_sprites = {}
@@ -30,6 +30,9 @@ class Settings:
         frame1 = lavaSheet.subsurface((0, 221, 16, 16))
         frame1_scaled = pygame.transform.scale(frame1, (1000, 1000))
         return frame1_scaled
+
+
+
 
     def load_lava_animations(self):
         lava_sheet = pygame.image.load('2d-game/assets/Terrain/lavaAnimation.png').convert_alpha()
@@ -98,8 +101,7 @@ class Settings:
         }
         return characters
 
-    def load_animation_frames(self, character_folder, action, num_frames,
-                              scale_factor=2):  # Added scale_factor argument
+    def load_animation_frames(self, character_folder, action, num_frames, target_width=50, target_height=50):
         path = f'2d-game/assets/MainCharacters/{character_folder}/{action}.png'
         sprite_sheet = pygame.image.load(path).convert_alpha()
         frame_width = sprite_sheet.get_width() // num_frames
@@ -108,8 +110,7 @@ class Settings:
         frames = []
         for i in range(num_frames):
             frame = sprite_sheet.subsurface((i * frame_width, 0, frame_width, frame_height))
-            scaled_frame = pygame.transform.scale(frame, (
-                frame_width * scale_factor, frame_height * scale_factor))  # Scale frame
+            scaled_frame = pygame.transform.scale(frame, (target_width, target_height))  # Scale frame to target size
             frames.append(scaled_frame)
 
         return frames
@@ -157,33 +158,43 @@ class Settings:
         # Assuming self.settings.map is a 2D list indicating the type of tile at each position
         for row_index, row in enumerate(self.map):
             for col_index, tile_type in enumerate(row):
-                print("PLATFORMS: ", tile_type)
-                x = col_index * tile_size
-                y = row_index * tile_size
-                block = StillObjects(tile_type, x, y, tile_size, tile_size, sprite=None)
-                self.platforms.append(block)
+                if tile_type == 1:
+                    print("PLATFORMS: ",tile_type)
+                    x = col_index * tile_size
+                    y = row_index * tile_size
+                    block = StillObjects(tile_type, x, y, tile_size, tile_size, sprite=None)
+                    self.platforms.append(block)
         self.assign_sprites_to_platforms()
 
     def assign_sprites_to_platforms(self):
         """Assigns sprites to platforms based on their block_id."""
-        block_sprites = self.load_block_sprites()
+        block_sprite = self.load_block_sprites()
 
         for block in self.platforms:
-            if block.id in block_sprites:
-                # block_sprite = block_sprites[block.id]
-                block_sprite = pygame.transform.scale(block_sprites[block.id], (block.width, block.height))
-                block.sprite = block_sprite
-                # block.sprite.rect = block.sprite.image.get_rect(topleft=(block.x, block.y))
+            sprite = pygame.transform.scale(block_sprite, (block.width, block.height))
+
+            print("Block sprite Width:", block.rect.width)
+            print("Block sprite Height:", block.rect.height)
+            block.sprite = sprite
+            # Optionally, you can set the rect here if needed
+            block.rect = block.sprite.get_rect(topleft=(block.x, block.y))
+            print("Block rect Width:", block.rect.width)
+            print("Block rect Height:", block.rect.height)
+
+
 
     def load_block_sprites(self):
         """Loads sprites for different block types."""
-        return {
-            1: pygame.image.load('2d-game/assets/Terrain/block1.png').convert_alpha(),
-            2: pygame.image.load('2d-game/assets/Background/Yellow.png').convert_alpha(),
+        spritesheet = pygame.image.load('2d-game/assets/Terrain/Terrain.png').convert_alpha()
+        sprite = spritesheet.subsurface(pygame.Rect(0,128,48,48))
+        sprite_width = sprite.get_width()
+        sprite_height = sprite.get_height()
 
-            # 2: pygame.image.load('assets/block2.png').convert_alpha(),
-            # ... add more block types and corresponding image paths
-        }
+        print("Sprite Width:", sprite_width)
+        print("Sprite Height:", sprite_height)
+
+        return sprite
+
 
 
     def load_background_image(self):

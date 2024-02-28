@@ -9,8 +9,12 @@ class Settings:
         self.map = [
             [-1, -1, -1, -1, -1, -1, -1, ],
             [-1, -1, -1, -1, -1, -1, -1, ],
-            [-1, -1, -1, -1, -1, 1, -1, ],
-            [-1, -1, -1, -1, 1, 1, -1, ],
+            [-1, -1, -1, -1, -1, -1, -1, ],
+            [-1, -1, -1, -1, -1, -1, -1, ],
+            [-1, -1, -1, -1, -1, -1, -1, ],
+            [-1, 1, -1, -1, -1, -1, -1, ],
+            [-1, -1, 1, 1, -1, -1, -1, ],
+            [-1, 1, 1, 1, -1, -1, -1, ],
             [1, 1, 1, 1, 1, 1, 1, ],
             [-1, -1, -1, -1, -1, -1, -1, ]
         ]
@@ -26,7 +30,7 @@ class Settings:
         self.load_background_image()  # Call the method to load the background image
 
     def loadLavaBlockSprite(self):
-        lavaSheet = pygame.image.load('2d-game/assets/Terrain/lavaAnimation.png').convert_alpha()
+        lavaSheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
         frame1 = lavaSheet.subsurface((0, 221, 16, 16))
         frame1_scaled = pygame.transform.scale(frame1, (1000, 1000))
         return frame1_scaled
@@ -35,7 +39,7 @@ class Settings:
 
 
     def load_lava_animations(self):
-        lava_sheet = pygame.image.load('2d-game/assets/Terrain/lavaAnimation.png').convert_alpha()
+        lava_sheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
         frame_width = 16
         frame_height = 16
         num_frames = 4
@@ -102,7 +106,7 @@ class Settings:
         return characters
 
     def load_animation_frames(self, character_folder, action, num_frames, target_width=50, target_height=50):
-        path = f'2d-game/assets/MainCharacters/{character_folder}/{action}.png'
+        path = f'assets/MainCharacters/{character_folder}/{action}.png'
         sprite_sheet = pygame.image.load(path).convert_alpha()
         frame_width = sprite_sheet.get_width() // num_frames
         frame_height = sprite_sheet.get_height()
@@ -154,7 +158,7 @@ class Settings:
 
     def create_blocks_from_map(self):
         """Creates block objects based on the map data."""
-        tile_size = 120  # Size of each tile
+        tile_size = 68  # Size of each tile
         # Assuming self.settings.map is a 2D list indicating the type of tile at each position
         for row_index, row in enumerate(self.map):
             for col_index, tile_type in enumerate(row):
@@ -174,18 +178,18 @@ class Settings:
             sprite = pygame.transform.scale(block_sprite, (block.width, block.height))
 
             print("Block sprite Width:", block.rect.width)
-            print("Block sprite Height:", block.rect.height)
+            print("Block sprite Height:", block.rect.height) 
             block.sprite = sprite
             # Optionally, you can set the rect here if needed
             block.rect = block.sprite.get_rect(topleft=(block.x, block.y))
             print("Block rect Width:", block.rect.width)
-            print("Block rect Height:", block.rect.height)
+            print("Block rect Height:", block.rect.height) 
 
 
 
     def load_block_sprites(self):
         """Loads sprites for different block types."""
-        spritesheet = pygame.image.load('2d-game/assets/Terrain/Terrain.png').convert_alpha()
+        spritesheet = pygame.image.load('assets/Terrain/Terrain.png').convert_alpha()
         sprite = spritesheet.subsurface(pygame.Rect(0,128,48,48))
         sprite_width = sprite.get_width()
         sprite_height = sprite.get_height()
@@ -196,10 +200,10 @@ class Settings:
         return sprite
 
 
-##
     def load_background_image(self):
         # Specify the path to your background image
-        background_path = '2d-game/assets/Background/Yellow.png' # Replace 'YourBackgroundImage.png' with your actual image file name
+        self.png = 'assets/Background/Yellow.png'
+        background_path = self.png  # Replace 'YourBackgroundImage.png' with your actual image file name
         # Load the image and assign it to the background_image attribute
         self.background_image = pygame.image.load(background_path).convert_alpha()  # Use convert_alpha() if your image has transparency; otherwise, just use convert()
         window_size = (800, 600)  # Update these dimensions to match your game window size

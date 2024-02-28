@@ -1,4 +1,5 @@
 import pygame
+import time
 
 class Player:
     def __init__(self, id, character, action, direction, x, y, width, height, colour, speed=5):
@@ -16,8 +17,13 @@ class Player:
         self.is_jumping = False
         self.on_ground = False  # Initialize the on_ground flag
         self.jump_velocity = 0  # Initialize jump velocity
-        self.jump_count = 30  # Adjust this for desired jump height
-        self.gravity = 0.8  # Adjust this for desired gravity strength
+        self.gravity = 0.9  # Adjust this for desired gravity strength
+
+        self.last_jump_time = 0  # Timestamp of last jump
+        self.jump_cooldown = 0.4  # Cooldown in seconds
+
+        print("Player Width:", self.rect.width)
+        print("Player Height:", self.rect.height)       
 
     # In your Player class
     def apply_gravity(self):
@@ -28,12 +34,15 @@ class Player:
             self.update_rect()  # Update rect after changing y-position
 
     def jump(self):
+        current_time = time.time()
+
         """Starts a jump if the player is standing on the ground."""
         print("PLAYER: Should be jumping")
-        if self.on_ground:
-            self.jump_velocity = -15  # Negative velocity means upwards jump
+        if self.on_ground and current_time - self.last_jump_time > self.jump_cooldown:
+            self.jump_velocity = -13  # Negative velocity means upwards jump
             self.is_jumping = True
             self.on_ground = False
+            self.last_jump_time = current_time  # Update last jump time
             self.update_rect()  # Update rect after changing y-position
 
     def handle_collisions(self, platforms):
@@ -59,7 +68,7 @@ class Player:
                 elif collision_side == "right":
                     self.x = platform.left - self.width
 
-        self.update_rect()
+            self.update_rect()
 
     def get_collision_side(self, platform):
         # Calculate the sides of the player and the platform
@@ -91,27 +100,12 @@ class Player:
         elif min_diff == right_diff:
             return 'right'
 
-    def get_collision_direction(self, platform):
-        # Determine the direction of the collision
-        # This is a simple approach and might need refinement based on your game's specifics
-        if self.rect.bottom >= platform.top and self.rect.bottom - self.speed <= platform.top:
-            return 'bottom'
-        elif self.rect.top <= platform.bottom and self.rect.top + self.speed >= platform.bottom:
-            return 'top'
-        elif self.rect.left <= platform.right and self.rect.left + self.speed >= platform.right:
-            return 'left'
-        elif self.rect.right >= platform.left and self.rect.right - self.speed <= platform.left:
-            return 'right'
-    #Helo
-
     def update_position_from_rect(self):
         # Update the player's position based on the rect
         self.x = self.rect.x
         self.y = self.rect.y
     def handleLavaCollisions(self,lavaBLocks):
         pass
-
-#
 
     def move_left(self):
         self.x -= self.speed

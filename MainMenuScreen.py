@@ -21,37 +21,37 @@ class MainMenuScreen:
         self.ninja_button = Button(60, 150, 300, 60, color=(207, 185, 151),
                               highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=24,
                               text='Ninja Frog',
-                              font='2d-game/assets/fonts/SC.ttf')  # Set up button parameters
+                              font='assets/fonts/SC.ttf')  # Set up button parameters
         self.mask_button = Button(60, 225, 300, 60, color=(207, 185, 151),
                              highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=24,
                              text='Mask Dude',
-                             font='2d-game/assets/fonts/SC.ttf')
+                             font='assets/fonts/SC.ttf')
 
         self.pink_button = Button(60, 300, 300, 60, color=(207, 185, 151),
                              highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=24,
                              text='Pink Man',
-                             font='2d-game/assets/fonts/SC.ttf')  # Set up button parameters
+                             font='assets/fonts/SC.ttf')  # Set up button parameters
         self.virtual_button = Button(60, 375, 300, 60, color=(207, 185, 151),
                                 highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=24,
                                 text='Virtual Guy',
-                                font='2d-game/assets/fonts/SC.ttf')
+                                font='assets/fonts/SC.ttf')
 
         self.return_button = Button(450, 375, 300, 60, color=(207, 185, 151),
                                highlight_color=(207, 185, 151), font_color=(255, 255, 0), font_size=30,
                                text='Return',
-                               font='2d-game/assets/fonts/SC.ttf')
+                               font='assets/fonts/SC.ttf')
         self.start_button = Button(250, 225, 300, 60, color=(207, 185, 151),
                               highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=24,
                               text='Start Game',
-                             font='2d-game/assets/fonts/SC.ttf')
+                             font='assets/fonts/SC.ttf')
 
         self.select_character_button = Button(250, 300, 300, 60, color=(207, 185, 151),
                                          highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=24,
                                          text='Select Character',
-                                        font='2d-game/assets/fonts/SC.ttf')
+                                        font='assets/fonts/SC.ttf')
 
-        self.play_game_sprite = pygame.image.load('2d-game/assets/menu/Buttons/Play.png').convert_alpha()
-        self.settings_sprite = pygame.image.load('2d-game/assets/menu/Buttons/Settings.png').convert_alpha()
+        self.play_game_sprite = pygame.image.load('assets/menu/Buttons/Play.png').convert_alpha()
+        self.settings_sprite = pygame.image.load('assets/menu/Buttons/Settings.png').convert_alpha()
 
         button_height = self.start_button.rect.height  # Assuming both buttons have the same height
 
@@ -194,7 +194,7 @@ class MainMenuScreen:
 
     def load_animation_frames(self, character_folder, action, num_frames,
                               scale_factor=2):  # Added scale_factor argument
-        path = f'2d-game/assets/MainCharacters/{character_folder}/{action}.png'
+        path = f'assets/MainCharacters/{character_folder}/{action}.png'
         sprite_sheet = pygame.image.load(path).convert_alpha()
         frame_width = sprite_sheet.get_width() // num_frames
         frame_height = sprite_sheet.get_height()

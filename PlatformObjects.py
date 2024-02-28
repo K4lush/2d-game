@@ -8,7 +8,7 @@ class StillObjects:
         self.height = height
         self.collision = collision  # Typo Fix: collision, not collsion
         self.sprite = sprite
-        self.rect = pygame.Rect(x, y, width, height)  # Create the rect attribute
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def draw(self, screen, position, offset_x=0, offset_y=0):
         if self.sprite:

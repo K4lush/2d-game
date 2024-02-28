@@ -80,7 +80,7 @@ class ClientHandler:
 
 
 class Server:
-    def __init__(self, host="0.0.0.0", port=5555):
+    def __init__(self, host, port):
         self.host = host
         self.port = port
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -98,7 +98,6 @@ class Server:
         self.lavaBlocks = []
         self.BiglavaBlock = None
         self.CreateLava()
-        self.settings = MapServer()  # Assuming this initializes the terrain
         self.platforms = self.create_platform_rects()  # Create platform rects
         self.CreateBigLavaBlock()
 
@@ -130,8 +129,8 @@ class Server:
 
     def create_platform_rects(self):
         platforms = []
-        block_width = 120  # The width of each block
-        block_height = 120  # The height of each block
+        block_width = 68  # The width of each block
+        block_height = 68  # The height of each block
 
         for row_index, row in enumerate(self.settings.map):
             for col_index, cell in enumerate(row):
@@ -141,7 +140,6 @@ class Server:
                     platforms.append(block_rect)
 
         return platforms
-    #helodd
 
     def add_client_handler(self, client_handler):
         with self.lock:
@@ -211,8 +209,6 @@ class Server:
             if not player.on_ground:
                 player.apply_gravity()
 
-
-
             # # 4. Handle Collisions
             player.handle_collisions(self.platforms)  # Assuming you have a list of platforms
 
@@ -222,9 +218,9 @@ class Server:
 
             for lava in self.lavaBlocks:
                 lava.update()
+
             self.BiglavaBlock.update()
             
-
 
     def find_player_by_id(self, client_id):
         for player in self.players:
@@ -233,7 +229,8 @@ class Server:
         return None  # Return None if no matching player is found
 
 
-if __name__ == '__main__':
-    print("This is correct server file")
-    server = Server()
+# if __name__ == '__main__':
+#     print("This is correct server file")
+def create_server(ip, port):
+    server = Server(ip, port)
     server.start_server()

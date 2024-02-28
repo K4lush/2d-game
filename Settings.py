@@ -3,6 +3,7 @@ import pygame
 from AnimatedSprite import AnimatedSprite
 from PlatformObjects import StillObjects
 
+
 class Settings:
     def __init__(self):
         self.map = [
@@ -15,7 +16,7 @@ class Settings:
             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            ]
+        ]
 
         self.platforms = []
         self.player_sprites = {}
@@ -24,12 +25,17 @@ class Settings:
         self.character_sprites = self.load_characters_sprites()
         self.lavaAnimationFrames = self.load_lava_animations()
         self.lavaBlockSprite = self.loadLavaBlockSprite()
+        self.background_image = None  # Add this line to initialize the background image attribute
+        self.load_background_image()  # Call the method to load the background image
 
     def loadLavaBlockSprite(self):
         lavaSheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
         frame1 = lavaSheet.subsurface((0, 221, 16, 16))
         frame1_scaled = pygame.transform.scale(frame1, (1000, 1000))
         return frame1_scaled
+
+
+
 
     def load_lava_animations(self):
         lava_sheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
@@ -41,15 +47,14 @@ class Settings:
         lava_frames = []
         for offset in frame_offsets:
             frame = lava_sheet.subsurface((offset, 0, frame_width, frame_height))
-            scaled_frame = pygame.transform.scale(frame, (frame_width * 3, frame_height * 3))  # Scale frame by a factor of 3
+            scaled_frame = pygame.transform.scale(frame,
+                                                  (frame_width * 3, frame_height * 3))  # Scale frame by a factor of 3
             lava_frames.append(scaled_frame)
 
-        
-
         return lava_frames
-    
+
     def updateLavaSprites(self, lavaBlocks):
-        #lava id as key animated sprite instance as value
+        # lava id as key animated sprite instance as value
         for lava in lavaBlocks:
             sprite_key = f'{lava.id}'
 
@@ -57,47 +62,42 @@ class Settings:
                 frames = self.lavaAnimationFrames
                 self.lava_sprites[sprite_key] = AnimatedSprite(frames, frame_rate=50)
             sprite = self.lava_sprites[sprite_key]
-            
-            sprite.update()
-            
 
-    def updateLavaBlock(self,lavaBlock):
-        
+            sprite.update()
+
+    def updateLavaBlock(self, lavaBlock):
+
         spriteKey = lavaBlock.id
         if spriteKey not in self.lava_sprites:
             frames = []
             frames.append(self.lavaBlockSprite)
-            
-            self.lava_sprites[spriteKey] = AnimatedSprite(frames, frame_rate=50)
-        
 
-        
-    
+            self.lava_sprites[spriteKey] = AnimatedSprite(frames, frame_rate=50)
 
     def load_characters_sprites(self):
         characters = {
             'NinjaFrog': {
                 'idle': self.load_animation_frames('NinjaFrog', 'idle', 11),
                 'run': self.load_animation_frames('NinjaFrog', 'run', 12),
-                #'died': self.load_animation_frames('NinjaFrog', 'died', 7),
+                # 'died': self.load_animation_frames('NinjaFrog', 'died', 7),
                 # Add more animations for NinjaFrog as needed
             },
             'MaskDude': {
                 'idle': self.load_animation_frames('MaskDude', 'idle', 11),
                 'run': self.load_animation_frames('MaskDude', 'run', 12),
-                #'died': self.load_animation_frames('MaskDude', 'died', 7),
+                # 'died': self.load_animation_frames('MaskDude', 'died', 7),
                 # Add more animations for MaskDude as needed
             },
             'PinkMan': {
                 'idle': self.load_animation_frames('PinkMan', 'idle', 11),
                 'run': self.load_animation_frames('PinkMan', 'run', 12),
-                #'died': self.load_animation_frames('PinkMan', 'died', 7),
+                # 'died': self.load_animation_frames('PinkMan', 'died', 7),
                 # Add more animations for NinjaFrog as needed
             },
             'VirtualGuy': {
                 'idle': self.load_animation_frames('VirtualGuy', 'idle', 11),
                 'run': self.load_animation_frames('VirtualGuy', 'run', 12),
-                #'died': self.load_animation_frames('VirtualGuy', 'died', 7),
+                # 'died': self.load_animation_frames('VirtualGuy', 'died', 7),
                 # Add more animations for MaskDude as needed
             }
             # Add more characters as needed
@@ -219,3 +219,12 @@ class Settings:
 
         return sprite
 
+
+
+    def load_background_image(self):
+        # Specify the path to your background image
+        background_path = 'assets/Background/Yellow.png' # Replace 'YourBackgroundImage.png' with your actual image file name
+        # Load the image and assign it to the background_image attribute
+        self.background_image = pygame.image.load(background_path).convert_alpha()  # Use convert_alpha() if your image has transparency; otherwise, just use convert()
+        window_size = (800, 600)  # Update these dimensions to match your game window size
+        self.background_image = pygame.transform.scale(self.background_image, window_size)

@@ -8,42 +8,44 @@ from Button import Button
 
 
 class MainMenuScreen:
-    def __init__(self):
+    def __init__(self, client_script):
         # Default Character if no character is chosen
+        self.client = client_script
         self.character = 'NinjaFrog'
+        self.switch_state = False
         self.screen = None
         self.character_sprites = self.load_characters_sprites()
         self.last_hovered_character = None
         self.current_state = "MAIN"
-        self.ninja_button = Button(60, 50, 300, 60, color=(207, 185, 151),
-                              highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=30,
+        self.ninja_button = Button(60, 150, 300, 60, color=(207, 185, 151),
+                              highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=24,
                               text='Ninja Frog',
                               font='assets/fonts/SC.ttf')  # Set up button parameters
-        self.mask_button = Button(60, 125, 300, 60, color=(207, 185, 151),
-                             highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=30,
+        self.mask_button = Button(60, 225, 300, 60, color=(207, 185, 151),
+                             highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=24,
                              text='Mask Dude',
                              font='assets/fonts/SC.ttf')
 
-        self.pink_button = Button(60, 200, 300, 60, color=(207, 185, 151),
-                             highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=30,
+        self.pink_button = Button(60, 300, 300, 60, color=(207, 185, 151),
+                             highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=24,
                              text='Pink Man',
                              font='assets/fonts/SC.ttf')  # Set up button parameters
-        self.virtual_button = Button(60, 275, 300, 60, color=(207, 185, 151),
-                                highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=30,
+        self.virtual_button = Button(60, 375, 300, 60, color=(207, 185, 151),
+                                highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=24,
                                 text='Virtual Guy',
                                 font='assets/fonts/SC.ttf')
 
-        self.return_button = Button(450, 275, 300, 60, color=(207, 185, 151),
+        self.return_button = Button(450, 375, 300, 60, color=(207, 185, 151),
                                highlight_color=(207, 185, 151), font_color=(255, 255, 0), font_size=30,
                                text='Return',
                                font='assets/fonts/SC.ttf')
-        self.start_button = Button(250, 125, 300, 60, color=(207, 185, 151),
-                              highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=30,
+        self.start_button = Button(250, 225, 300, 60, color=(207, 185, 151),
+                              highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=24,
                               text='Start Game',
                              font='assets/fonts/SC.ttf')
 
-        self.select_character_button = Button(250, 225, 300, 60, color=(207, 185, 151),
-                                         highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=30,
+        self.select_character_button = Button(250, 300, 300, 60, color=(207, 185, 151),
+                                         highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=24,
                                          text='Select Character',
                                         font='assets/fonts/SC.ttf')
 
@@ -55,28 +57,34 @@ class MainMenuScreen:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 print("THIS IS EVENT", event)
 
+                if self.start_button.rect.collidepoint(pygame.mouse.get_pos()):
+                    self.switch_state = True
+
                 if self.ninja_button.rect.collidepoint(pygame.mouse.get_pos()):
                     self.character = 'NinjaFrog'
 
-                elif self.mask_button.rect.collidepoint(pygame.mouse.get_pos()):
-                    self.character = 'MaskDude'
-
-                elif self.pink_button.rect.collidepoint(pygame.mouse.get_pos()):
-                    self.character = 'PinkMan'
-
-                elif self.virtual_button.rect.collidepoint(pygame.mouse.get_pos()):
-                    self.character = 'VirtualGuy'
-
-                elif self.select_character_button.rect.collidepoint(pygame.mouse.get_pos()):
+                if self.select_character_button.rect.collidepoint(pygame.mouse.get_pos()):
                     self.current_state = "SHOW CHARACTER"
 
-                elif self.return_button.rect.collidepoint(pygame.mouse.get_pos()):
+                if self.return_button.rect.collidepoint(pygame.mouse.get_pos()):
                     self.current_state = "MAIN"
+
+                if self.mask_button.rect.collidepoint(pygame.mouse.get_pos()):
+                    self.character = 'MaskDude'
+
+                if self.pink_button.rect.collidepoint(pygame.mouse.get_pos()):
+                    self.character = 'PinkMan'
+
+                if self.virtual_button.rect.collidepoint(pygame.mouse.get_pos()):
+                    self.character = 'VirtualGuy'
+
 
 
 
     def update(self):
-        if self.start_button.rect.collidepoint(pygame.mouse.get_pos()):
+        print("UPDATE: ", self.switch_state)
+
+        if self.switch_state:
             return "PLAYING"
 
         # In your select_character method's loop
@@ -126,7 +134,7 @@ class MainMenuScreen:
             scaled_frame = pygame.transform.scale(current_frame, (
             current_frame.get_width() * scale_factor, current_frame.get_height() * scale_factor))
 
-            animation_pos = (500, 50)  # Adjust as necessary
+            animation_pos = (500, 150)  # Adjust as necessary
             screen.blit(scaled_frame, animation_pos)
 
     def load_characters_sprites(self):

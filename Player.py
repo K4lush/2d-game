@@ -19,6 +19,9 @@ class Player:
         self.jump_count = 30  # Adjust this for desired jump height
         self.gravity = 0.8  # Adjust this for desired gravity strength
 
+        print("Player Width:", self.rect.width)
+        print("Player Height:", self.rect.height)       
+
     # In your Player class
     def apply_gravity(self):
         """Makes the player fall downwards if they're not on the ground."""
@@ -40,7 +43,11 @@ class Player:
         """Checks if the player hits the ground (replace 200 with your ground level)."""
         for platform in platforms:
             if self.rect.bottom >= platform.rect.y:
+                print("this is player bottom: ",self.rect.bottom)
+                print("this is platform top: ",platform.rect.y)
                 self.y = platform.rect.y - self.height  # Align player with the ground
+                print("AFTER this is player bottom: ",self.rect.bottom)
+                print("AFTER this is platform top: ",platform.rect.y)
                 self.on_ground = True
                 self.jump_velocity = 0  # Stop falling when you hit the ground
             self.update_rect()  # Update rect after changing y-position

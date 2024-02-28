@@ -10,6 +10,9 @@ class StillObjects:
         self.sprite = sprite
         self.rect = pygame.Rect(x, y, width, height)  # Create the rect attribute
 
+        print("Block Width:", self.rect.width)
+        print("Block Height:", self.rect.height) 
+
     def draw(self, screen, position):
         if self.sprite:
             screen.blit(self.sprite, position)  # Draw if a sprite is assigned

@@ -170,7 +170,7 @@ class Server:
         print(self.pressed_keys)
 
         print("SERVER: Received keys:", pressed_keys, "for player", player.id)  # Enhanced logging
-
+        
         if player:
             if pressed_keys == ['idle']:
                 player.action = 'idle'
@@ -207,6 +207,7 @@ class Server:
             for lava in self.lavaBlocks:
                 lava.update()
             self.BiglavaBlock.update()
+            
 
 
     def find_player_by_id(self, client_id):

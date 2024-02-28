@@ -4,7 +4,8 @@ from Button import Button
 from text_input import TextInput
 
 from Network import Network
-from Server import create_server
+from Server import Server
+from threading import Thread
 
 import pygame
 
@@ -89,9 +90,17 @@ class JoinGameScreen:
 
         if self.create_server:
             ip_address = self.ip_input_Server.get_text()
-            port = int(self.port_input_Server.get_text())  # Assuming port input is numerical
-            create_server(ip_address, port)
-            print("server has been created")
+            port = int(self.port_input_Server.get_text())
+
+            def start_server_thread():  # Create a function to start the server in a thread
+                self.server = Server(ip_address, port)
+                self.server.start_server()  # Start the server (which internally handles client connections)
+
+            server_thread = Thread(target=start_server_thread)
+            server_thread.start()
+
+            print("Server has been created")
+            self.create_server = False  # Reset the flag
 
         if self.switch_state:
             # return GameState.CHARACTER_SELECT  # Return the new desired state

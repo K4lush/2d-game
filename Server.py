@@ -1,6 +1,7 @@
 import pickle
 import socket
 import pygame
+from threading import Thread
 
 from _thread import start_new_thread
 import threading
@@ -100,6 +101,8 @@ class Server:
         self.CreateLava()
         self.platforms = self.create_platform_rects()  # Create platform rects
         self.CreateBigLavaBlock()
+
+        # self.start_server()
 
     def start_server(self):
         self.server.bind((self.host, self.port))
@@ -230,7 +233,7 @@ class Server:
 
 
 # if __name__ == '__main__':
-#     print("This is correct server file")
-def create_server(ip, port):
-    server = Server(ip, port)
-    server.start_server()
+# #     print("This is correct server file")
+# def create_server(ip, port):
+#     server = Server(ip, port)
+#     server.start_server()

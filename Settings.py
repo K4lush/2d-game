@@ -7,16 +7,14 @@ from PlatformObjects import StillObjects
 class Settings:
     def __init__(self):
         self.map = [
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1, -1, ],
+            [-1, -1, -1, -1, -1, -1, -1, ],
+            [-1, -1, -1, -1, -1, 1, -1, ],
+            [-1, -1, -1, -1, 1, 1, -1, ],
+            [1, 1, 1, 1, 1, 1, 1, ],
+            [-1, -1, -1, -1, -1, -1, -1, ]
         ]
+
 
         self.platforms = []
         self.player_sprites = {}
@@ -27,13 +25,13 @@ class Settings:
         self.lavaBlockSprite = self.loadLavaBlockSprite()
 
     def loadLavaBlockSprite(self):
-        lavaSheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
+        lavaSheet = pygame.image.load('2d-game/assets/Terrain/lavaAnimation.png').convert_alpha()
         frame1 = lavaSheet.subsurface((0, 221, 16, 16))
         frame1_scaled = pygame.transform.scale(frame1, (1000, 1000))
         return frame1_scaled
 
     def load_lava_animations(self):
-        lava_sheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
+        lava_sheet = pygame.image.load('2d-game/assets/Terrain/lavaAnimation.png').convert_alpha()
         frame_width = 16
         frame_height = 16
         num_frames = 4
@@ -101,7 +99,7 @@ class Settings:
 
     def load_animation_frames(self, character_folder, action, num_frames,
                               scale_factor=2):  # Added scale_factor argument
-        path = f'assets/MainCharacters/{character_folder}/{action}.png'
+        path = f'2d-game/assets/MainCharacters/{character_folder}/{action}.png'
         sprite_sheet = pygame.image.load(path).convert_alpha()
         frame_width = sprite_sheet.get_width() // num_frames
         frame_height = sprite_sheet.get_height()
@@ -154,7 +152,7 @@ class Settings:
 
     def create_blocks_from_map(self):
         """Creates block objects based on the map data."""
-        tile_size = 80  # Size of each tile
+        tile_size = 120  # Size of each tile
         # Assuming self.settings.map is a 2D list indicating the type of tile at each position
         for row_index, row in enumerate(self.map):
             for col_index, tile_type in enumerate(row):
@@ -179,7 +177,7 @@ class Settings:
     def load_block_sprites(self):
         """Loads sprites for different block types."""
         return {
-            1: pygame.image.load('assets/Terrain/block1.png').convert_alpha(),
+            1: pygame.image.load('2d-game/assets/Terrain/block1.png').convert_alpha(),
             # 2: pygame.image.load('assets/block2.png').convert_alpha(),
             # ... add more block types and corresponding image paths
         }

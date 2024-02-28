@@ -1,5 +1,6 @@
 import pickle
 import socket
+import pygame
 
 from _thread import start_new_thread
 import threading
@@ -97,6 +98,8 @@ class Server:
         self.lavaBlocks = []
         self.BiglavaBlock = None
         self.CreateLava()
+        self.settings = MapServer()  # Assuming this initializes the terrain
+        self.platforms = self.create_platform_rects()  # Create platform rects
         self.CreateBigLavaBlock()
 
     def start_server(self):
@@ -124,6 +127,21 @@ class Server:
         if len(self.players) == 2 and not self.rope_created:
             self.rope = Rope(self.players[0], self.players[1], 150)
             self.rope_created = True
+
+    def create_platform_rects(self):
+        platforms = []
+        block_width = 120  # The width of each block
+        block_height = 120  # The height of each block
+
+        for row_index, row in enumerate(self.settings.map):
+            for col_index, cell in enumerate(row):
+                if cell == 1:  # 1 represents a block
+                    block_rect = pygame.Rect(col_index * block_width, row_index * block_height, block_width,
+                                             block_height)
+                    platforms.append(block_rect)
+
+        return platforms
+
 
     def add_client_handler(self, client_handler):
         with self.lock:
@@ -193,8 +211,10 @@ class Server:
             if not player.on_ground:
                 player.apply_gravity()
 
-            # 4. Handle Collisions
-            player.handle_collisions(self.settings.terrain)  # Assuming you have a list of platforms
+
+
+            # # 4. Handle Collisions
+            player.handle_collisions(self.platforms)  # Assuming you have a list of platforms
 
             # 5. Update Rope (if it exists)
             if self.rope:
@@ -203,6 +223,7 @@ class Server:
             for lava in self.lavaBlocks:
                 lava.update()
             self.BiglavaBlock.update()
+
 
     def find_player_by_id(self, client_id):
         for player in self.players:

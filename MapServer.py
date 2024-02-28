@@ -6,16 +6,13 @@ from PlatformObjects import StillObjects
 class MapServer:
     def __init__(self):
         self.map = [
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            ]
+            [-1, -1, -1, -1, -1, -1, -1, ],
+            [-1, -1, -1, -1, -1, -1, -1, ],
+            [-1, -1, -1, -1, -1, 1, -1, ],
+            [-1, -1, -1, -1, 1, 1, -1, ],
+            [1, 1, 1, 1, 1, 1, 1, ],
+            [-1, -1, -1, -1, -1, -1, -1, ]
+        ]
 
         self.platforms = []
         self.terrain = []
@@ -24,7 +21,7 @@ class MapServer:
 
     def create_blocks_from_map(self):
         """Creates block objects based on the map data."""
-        tile_size = 80  # Size of each tile
+        tile_size = 120  # Size of each tile
         # Assuming self.settings.map is a 2D list indicating the type of tile at each position
         for row_index, row in enumerate(self.map):
             for col_index, tile_type in enumerate(row):

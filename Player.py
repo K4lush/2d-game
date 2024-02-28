@@ -37,14 +37,76 @@ class Player:
             self.update_rect()  # Update rect after changing y-position
 
     def handle_collisions(self, platforms):
-        """Checks if the player hits the ground (replace 200 with your ground level)."""
-        for platform in platforms:
-            if self.rect.bottom >= platform.rect.y:
-                self.y = platform.rect.y - self.height  # Align player with the ground
-                self.on_ground = True
-                self.jump_velocity = 0  # Stop falling when you hit the ground
-            self.update_rect()  # Update rect after changing y-position
+        self.on_ground = False
 
+        for platform in platforms:
+            if self.rect.colliderect(platform):
+                collision_side = self.get_collision_side(platform)
+                print(f"Collision detected on {collision_side}")  # Debugging print
+
+                if collision_side == "bottom":
+                    self.y = platform.top - self.height
+                    self.on_ground = True
+                    self.jump_velocity = 0
+
+                elif collision_side == "top":
+                    self.y = platform.bottom
+                    self.jump_velocity = 0
+
+                elif collision_side == "left":
+                    self.x = platform.right
+
+                elif collision_side == "right":
+                    self.x = platform.left - self.width
+
+        self.update_rect()
+
+    def get_collision_side(self, platform):
+        # Calculate the sides of the player and the platform
+        player_bottom = self.rect.bottom
+        player_top = self.rect.top
+        player_left = self.rect.left
+        player_right = self.rect.right
+
+        platform_bottom = platform.bottom
+        platform_top = platform.top
+        platform_left = platform.left
+        platform_right = platform.right
+
+        # Calculate the difference between each side
+        bottom_diff = abs(player_bottom - platform_top)
+        top_diff = abs(player_top - platform_bottom)
+        left_diff = abs(player_left - platform_right)
+        right_diff = abs(player_right - platform_left)
+
+        # Find the minimum difference to determine the collision side
+        min_diff = min(bottom_diff, top_diff, left_diff, right_diff)
+
+        if min_diff == bottom_diff:
+            return 'bottom'
+        elif min_diff == top_diff:
+            return 'top'
+        elif min_diff == left_diff:
+            return 'left'
+        elif min_diff == right_diff:
+            return 'right'
+
+    def get_collision_direction(self, platform):
+        # Determine the direction of the collision
+        # This is a simple approach and might need refinement based on your game's specifics
+        if self.rect.bottom >= platform.top and self.rect.bottom - self.speed <= platform.top:
+            return 'bottom'
+        elif self.rect.top <= platform.bottom and self.rect.top + self.speed >= platform.bottom:
+            return 'top'
+        elif self.rect.left <= platform.right and self.rect.left + self.speed >= platform.right:
+            return 'left'
+        elif self.rect.right >= platform.left and self.rect.right - self.speed <= platform.left:
+            return 'right'
+
+    def update_position_from_rect(self):
+        # Update the player's position based on the rect
+        self.x = self.rect.x
+        self.y = self.rect.y
     def handleLavaCollisions(self,lavaBLocks):
         pass
 

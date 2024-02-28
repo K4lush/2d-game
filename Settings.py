@@ -14,7 +14,7 @@ class Settings:
             [1, 1, 1, 1, 1, 1, 1, ],
             [-1, -1, -1, -1, -1, -1, -1, ]
         ]
-
+#H
         self.platforms = []
         self.player_sprites = {}
         self.lava_sprites = {}
@@ -188,7 +188,7 @@ class Settings:
 
     def load_background_image(self):
         # Specify the path to your background image
-        background_path = 'assets/Background/Yellow.png' # Replace 'YourBackgroundImage.png' with your actual image file name
+        background_path = '2d-game/assets/Background/Yellow.png' # Replace 'YourBackgroundImage.png' with your actual image file name
         # Load the image and assign it to the background_image attribute
         self.background_image = pygame.image.load(background_path).convert_alpha()  # Use convert_alpha() if your image has transparency; otherwise, just use convert()
         window_size = (800, 600)  # Update these dimensions to match your game window size

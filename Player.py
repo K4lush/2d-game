@@ -102,6 +102,7 @@ class Player:
             return 'left'
         elif self.rect.right >= platform.left and self.rect.right - self.speed <= platform.left:
             return 'right'
+    #Helo
 
     def update_position_from_rect(self):
         # Update the player's position based on the rect

@@ -141,7 +141,7 @@ class Server:
                     platforms.append(block_rect)
 
         return platforms
-
+    #helo
 
     def add_client_handler(self, client_handler):
         with self.lock:

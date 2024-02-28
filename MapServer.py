@@ -13,7 +13,7 @@ class MapServer:
             [1, 1, 1, 1, 1, 1, 1, ],
             [-1, -1, -1, -1, -1, -1, -1, ]
         ]
-
+#
         self.platforms = []
         self.terrain = []
 

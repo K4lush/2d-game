@@ -38,7 +38,7 @@ class Network:
         """
         try:
             # Adjust the buffer size as needed
-            buffer_size = 4096
+            buffer_size = 16484
             received_data = self.client.recv(buffer_size)
             #print(pickle.loads(received_data))
             return received_data  # Return the raw data

@@ -25,12 +25,17 @@ class Settings:
         self.character_sprites = self.load_characters_sprites()
         self.lavaAnimationFrames = self.load_lava_animations()
         self.lavaBlockSprite = self.loadLavaBlockSprite()
+        self.background_image = None  # Add this line to initialize the background image attribute
+        self.load_background_image()  # Call the method to load the background image
 
     def loadLavaBlockSprite(self):
         lavaSheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
         frame1 = lavaSheet.subsurface((0, 221, 16, 16))
         frame1_scaled = pygame.transform.scale(frame1, (1000, 1000))
         return frame1_scaled
+
+
+
 
     def load_lava_animations(self):
         lava_sheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
@@ -180,6 +185,16 @@ class Settings:
         """Loads sprites for different block types."""
         return {
             1: pygame.image.load('assets/Terrain/block1.png').convert_alpha(),
+            2: pygame.image.load('assets/Background/Yellow.png').convert_alpha(),
             # 2: pygame.image.load('assets/block2.png').convert_alpha(),
             # ... add more block types and corresponding image paths
         }
+
+
+    def load_background_image(self):
+        # Specify the path to your background image
+        background_path = 'assets/Background/Yellow.png' # Replace 'YourBackgroundImage.png' with your actual image file name
+        # Load the image and assign it to the background_image attribute
+        self.background_image = pygame.image.load(background_path).convert_alpha()  # Use convert_alpha() if your image has transparency; otherwise, just use convert()
+        window_size = (800, 600)  # Update these dimensions to match your game window size
+        self.background_image = pygame.transform.scale(self.background_image, window_size)

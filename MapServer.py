@@ -36,4 +36,3 @@ class MapServer:
 
                 if tile_type == 1:
                     self.terrain.append(block)
-

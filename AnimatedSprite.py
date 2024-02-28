@@ -21,10 +21,17 @@ class AnimatedSprite:
             self.last_update = now
             self.current_frame = (self.current_frame + 1) % len(self.images)
 
-    def draw(self, surface, position):
-        frame = self.images[self.current_frame]
-        surface.blit(frame, position)
+    # def draw(self, surface, position):
+    #     frame = self.images[self.current_frame]
+    #     surface.blit(frame, position)
 
+    def draw(self, surface, position, offset_x=0, offset_y=0):
+        print(offset_y, offset_x)
+        # Apply the offset to the position
+        offset_position = (position[0] - offset_x, position[1] - offset_y)
+        # Draw the current frame of the animation on the given surface.
+        frame = self.images[self.current_frame]
+        surface.blit(frame, offset_position)
     def flip_images(self, force_flip=False):
         if self.flipped != True or force_flip:
             self.images = [pygame.transform.flip(img, True, False) for img in self.original_images]

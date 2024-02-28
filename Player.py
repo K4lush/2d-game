@@ -111,6 +111,8 @@ class Player:
     def handleLavaCollisions(self,lavaBLocks):
         pass
 
+#
+
     def move_left(self):
         self.x -= self.speed
         self.update_rect()

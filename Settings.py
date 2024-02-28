@@ -196,7 +196,7 @@ class Settings:
         return sprite
 
 
-
+##
     def load_background_image(self):
         # Specify the path to your background image
         background_path = '2d-game/assets/Background/Yellow.png' # Replace 'YourBackgroundImage.png' with your actual image file name

@@ -16,7 +16,7 @@ class MapServer:
 #
         self.platforms = []
         self.terrain = []
-
+#
         self.create_blocks_from_map()
 
     def create_blocks_from_map(self):

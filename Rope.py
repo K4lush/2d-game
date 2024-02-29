@@ -26,11 +26,6 @@ class Rope:
                 direction_x = 0
                 direction_y = 0
 
-            # Apply pull (assuming equal force on both players for now)
-            self.player1.x += direction_x * pull_amount / 2
-            self.player1.update_rect()
-            self.player2.x -= direction_x * pull_amount / 2
-            self.player2.update_rect()
             # Apply pull to each player if they are not on the ground
             if not self.player1.on_ground:
                 self.player1.x += direction_x * pull_amount / 2

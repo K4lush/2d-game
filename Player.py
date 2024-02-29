@@ -33,6 +33,19 @@ class Player:
             self.y += self.jump_velocity
             self.update_rect()  # Update rect after changing y-position
 
+    def to_json(self):
+        return {
+            'id': self.id,
+            'character': self.character,
+            'action': self.action,
+            'direction': self.direction,
+            'x': self.x,
+            'y': self.y,
+            'rect_centerx': self.rect.centerx,  # Add rect.centerx
+            'rect_centery': self.rect.centery,  # Add rect.centery
+            # ... other necessary attributes ...
+        }
+
     def jump(self):
         current_time = time.time()
 

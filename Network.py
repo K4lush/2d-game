@@ -1,11 +1,15 @@
 import socket
 import pickle
 
+import json
+
 from Settings import Settings
 
 class Network:
     def __init__(self, ip, port):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # self.client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Change to UDP
+
         # self.server = "172.20.10.12"
         # self.port = 12345
         self.server = ip
@@ -23,25 +27,58 @@ class Network:
             print(f"General Connection Error: {e}")
         return None
 
+    # def send(self, data):
+    #     """
+    #     Send data to the server.
+    #     """
+    #     try:
+    #         self.client.send(pickle.dumps(data))
+    #     except socket.error as e:
+    #         print(e)
+
     def send(self, data):
-        """
-        Send data to the server.
-        """
         try:
-            self.client.send(pickle.dumps(data))
+            json_data = json.dumps(data)
+
+            self.client.sendall(json_data.encode())  # Send the JSON string directly
+
+            print("NETWORK: Sending data...", data)
+
         except socket.error as e:
             print(e)
 
+    # def receive(self):
+    #     try:
+    #         buffer_size = 4096
+    #         json_data = self.client.recv(buffer_size).decode('utf-8')  # Receive bytes, decode to string
+    #
+    #         print("NETWORK: Receiving data after decoding...", json_data)
+    #
+    #         data = json.loads(json_data)  # Convert JSON string to Python data
+    #
+    #         # print("NETWORK: Receiving data after loading...", data)
+    #
+    #         return data
+    #     except socket.error as e:
+    #         print(f"Socket Error: {e}")
+    #     except Exception as e:
+    #         print(f"General Error: {e}")
+    #     return None
+
     def receive(self):
-        """
-        Receive data from the server.
-        """
         try:
-            # Adjust the buffer size as needed
-            buffer_size = 16484
-            received_data = self.client.recv(buffer_size)
-            #print(pickle.loads(received_data))
-            return received_data  # Return the raw data
+            buffer_size = 4096
+            received_data = self.client.recv(buffer_size).decode('utf-8')  # Receive the raw data
+            print("NETWORK: Raw Data Received:", received_data)  # Inspect this!
+
+            # json_data = received_data.decode('utf-8')
+
+            data = json.loads(received_data)
+
+            print("NETWORK: Data Received:", received_data)  # Inspect this!
+
+
+            return data
         except socket.error as e:
             print(f"Socket Error: {e}")
         except Exception as e:

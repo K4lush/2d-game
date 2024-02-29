@@ -37,7 +37,6 @@ class Settings:
 
 
 
-
     def load_lava_animations(self):
         lava_sheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
         frame_width = 16
@@ -121,12 +120,20 @@ class Settings:
 
     def update_player_sprite(self, players):
 
-        for player in players:
-            character = player.character
-            action = player.action
-            direction = player.direction
+        print("SETTINGS: update_player_sprite", players)
 
-            sprite_key = f'{player.id}_{character}_{action}'
+        for player in players:
+
+            print("SETTINGS: update_player_sprite (player)", player)
+
+            id = player['id']
+            character = player['character']
+            action = player['action']
+            direction = player['direction']
+
+            print("SETTING: ", id, character, action, direction)
+
+            sprite_key = f'{id}_{character}_{action}'
 
             if sprite_key not in self.player_sprites:
                 if character in self.character_sprites and action in self.character_sprites[character]:
@@ -140,13 +147,13 @@ class Settings:
 
             sprite = self.player_sprites[sprite_key]
 
-            # Adjust sprite frame rate for 'died' state only if needed
-            if player.action == 'died' and not sprite.died_state_started:
-                sprite.frame_rate = 200
-                sprite.died_state_started = True
-            elif player.action != 'died' and sprite.died_state_started:
-                sprite.frame_rate = 50
-                sprite.died_state_started = False
+            # # Adjust sprite frame rate for 'died' state only if needed
+            # if player.action == 'died' and not sprite.died_state_started:
+            #     sprite.frame_rate = 200
+            #     sprite.died_state_started = True
+            # elif player.action != 'died' and sprite.died_state_started:
+            #     sprite.frame_rate = 50
+            #     sprite.died_state_started = False
 
                 # Conditionally flip the sprite based on direction
             if (direction == 'left' and not sprite.flipped) or \
@@ -163,7 +170,6 @@ class Settings:
         for row_index, row in enumerate(self.map):
             for col_index, tile_type in enumerate(row):
                 if tile_type == 1:
-                    print("PLATFORMS: ",tile_type)
                     x = col_index * tile_size
                     y = row_index * tile_size
                     block = StillObjects(tile_type, x, y, tile_size, tile_size, sprite=None)
@@ -176,14 +182,10 @@ class Settings:
 
         for block in self.platforms:
             sprite = pygame.transform.scale(block_sprite, (block.width, block.height))
-
-            print("Block sprite Width:", block.rect.width)
-            print("Block sprite Height:", block.rect.height) 
             block.sprite = sprite
             # Optionally, you can set the rect here if needed
             block.rect = block.sprite.get_rect(topleft=(block.x, block.y))
-            print("Block rect Width:", block.rect.width)
-            print("Block rect Height:", block.rect.height) 
+
 
 
 
@@ -191,12 +193,6 @@ class Settings:
         """Loads sprites for different block types."""
         spritesheet = pygame.image.load('assets/Terrain/Terrain.png').convert_alpha()
         sprite = spritesheet.subsurface(pygame.Rect(0,128,48,48))
-        sprite_width = sprite.get_width()
-        sprite_height = sprite.get_height()
-
-        print("Sprite Width:", sprite_width)
-        print("Sprite Height:", sprite_height)
-
         return sprite
 
 

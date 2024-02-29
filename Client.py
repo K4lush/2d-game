@@ -2,6 +2,7 @@ import time
 
 import pygame
 import pickle
+import json
 
 from JoinGameScreen import JoinGameScreen
 from MainMenuScreen import MainMenuScreen
@@ -34,7 +35,9 @@ class Client:
     def update(self):
         if self.current_state == "PLAYING":
             incoming_game_state = self.receiveFromServer()
-            print("CLIENT: Received state:", incoming_game_state)  # Enhanced logging
+
+            print("CLIENT: This is what the Client is receiving", incoming_game_state)
+
             self.game_logic.update(incoming_game_state)
 
         elif self.current_state == "JOIN MENU":
@@ -82,7 +85,12 @@ class Client:
 
         elif self.current_state == "PLAYING":
             keys = pygame.key.get_pressed()
+
+
             outgoing_game_state = self.game_logic.handle_event(keys)
+
+            print("TYPE OF GAME STATE ELEMENTS:", [type(x) for x in outgoing_game_state])
+
             print("THIS IS WHAT THE CLIENT IS SENDING", outgoing_game_state)
             self.sendToServer(outgoing_game_state)
 
@@ -104,9 +112,15 @@ class Client:
 
         pygame.display.flip()
 
+
+
     def sendToServer(self, data):
         try:
-            self.network.send(data)
+            # json_data = json.dumps(data)
+            #
+            # print("CLIENT: This is sendToServer Method", data, json_data)
+
+            self.network.send(data)  # Remember to use sendall for UDP
         except Exception as e:
             print(f"Error sending data to server: {e}")
 
@@ -114,11 +128,30 @@ class Client:
         incomingData = self.network.receive()
         if incomingData:
             try:
-                incomingData = pickle.loads(incomingData)
+                # incomingData = json.loads(incomingData)
                 return incomingData
-            except pickle.UnpicklingError as e:
-                print(f"Error unpickling data: {e}")
-        return []
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON data: {e}")
+        return []  # Return an empty list if there's an issue
+
+
+
+    # def sendToServer(self, data):
+    #     try:
+    #         self.network.send(data)
+    #     except Exception as e:
+    #         print(f"Error sending data to server: {e}")
+
+    # def receiveFromServer(self):
+    #     incomingData = self.network.receive()
+    #     if incomingData:
+    #         try:
+    #             incomingData = pickle.loads(incomingData)
+    #             return incomingData
+    #         except pickle.UnpicklingError as e:
+    #             print(f"Error unpickling data: {e}")
+    #     return []
+
 
 if __name__ == "__main__":
     client = Client()

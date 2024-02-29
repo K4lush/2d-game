@@ -1,10 +1,14 @@
 import pickle
 import socket
+import time
+
 import pygame
 from threading import Thread
 
 from _thread import start_new_thread
 import threading
+
+import json
 
 from PlatformObjects import StillObjects
 from Player import Player
@@ -51,10 +55,8 @@ class ClientHandler:
             self.disconnect()
 
     def wait_until_ready(self):
-        print("Server reached this point")
         while not self.ready:
             data = self.server.receive_from_client_state(self)
-
             state = data['state']
             character = data['character']
 
@@ -63,16 +65,25 @@ class ClientHandler:
                 self.ready = True
                 self.server.players_ready_state[self.id] = True
 
-    def wait_until_all_ready(self):
-        print(self.server.players_ready_state)
-        while not all(self.server.players_ready_state):
-            self.server.broadcast_state_to_client(self.client, "NOT READY")
-        self.server.broadcast_state_to_client(self.client, "READY")
+
+    ### Needs to be JSON ###
+    # def wait_until_all_ready(self):
+    #     print(self.server.players_ready_state)
+    #     while not all(self.server.players_ready_state):
+    #         self.server.broadcast_state_to_client(self.client, "NOT READY")
+    #     self.server.broadcast_state_to_client(self.client, "READY")
 
     def game_loop(self):
         while self.connected:
-            self.server.broadcast_to_client(self.client)
             self.server.receive_from_client_update(self)
+
+            self.server.broadcast_to_client(self.client)
+
+
+            # self.server.new_broadcast()
+
+            # time.sleep(0.1)
+
 
     def disconnect(self):
         self.connected = False
@@ -85,6 +96,8 @@ class Server:
         self.host = host
         self.port = port
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # self.server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Change to UDP
+
         self.lock = threading.Lock()
         self.settings = MapServer()
         self.client_handlers = []
@@ -95,6 +108,7 @@ class Server:
         self.platforms_sent = False
         self.rope_created = False
         self.rope = None
+        self.rope_data = None
         self.players = []
         self.lavaBlocks = []
         self.BiglavaBlock = None
@@ -109,11 +123,139 @@ class Server:
         self.server.listen()
         print(f"Server started, listening on IP: {self.host}")
 
-        while True:
+        while True:  # Main combined loop
             client, addr = self.server.accept()
             client_handler = ClientHandler(client, addr, self)
-            self.add_client_handler(client_handler)  # Use the new method to add client handlers
+            self.add_client_handler(client_handler)
             start_new_thread(client_handler.game, ())
+
+            # Game logic updates:
+            # self.update_game_state()
+
+
+    # def new_broadcast(self):
+    #     # Send to ready clients
+    #     for client_handler in self.client_handlers:
+    #         if client_handler.ready:
+    #             print(f"SERVER: Broadcasting client {client_handler.id}")
+    #             self.broadcast_to_client(client_handler.client)
+
+    def add_client_handler(self, client_handler):
+        with self.lock:
+            self.client_handlers.append(client_handler)
+
+    def remove_client_handler(self, client_handler):
+        with self.lock:
+            if client_handler in self.client_handlers:
+                self.client_handlers.remove(client_handler)
+                print(f"Client {client_handler.address} disconnected")
+
+    def broadcast_to_client(self, client):
+
+        if self.rope:
+            self.rope_data = self.rope.to_json()
+
+        gameState = {
+            # 'Players': self.players,
+            'Players': [player.to_json() for player in self.players], # Serialize players
+
+            'Rope': self.rope_data,
+            # 'Lava': self.lavaBlocks,
+            # 'LavaBlock': self.BiglavaBlock
+        }
+
+        # data = pickle.dumps(gameState)
+        #
+        # print("SERVER: This is what the server is sending", gameState)
+        #
+        # client.sendall(data)
+
+        print("SERVER: GameState being prepared:", gameState)
+
+        data = json.dumps(gameState)
+
+        print("SERVER: Sending data (once encoded):", data)
+
+        client.send(data.encode())
+
+    # def broadcast_state_to_client(self, client, data):
+    #     state = pickle.dumps(data)
+    #     client.sendall(state)
+
+    def receive_from_client_update(self, client):
+        # data = pickle.loads(obj.client.recv(4096))
+
+        buffer_size = 4096  # Adjust buffer size if needed
+
+        json_data = client.client.recv(buffer_size).decode('utf-8')  # Receive as bytes, decode to string
+
+        data = json.loads(json_data)  # Deserialize JSON string into Python data
+
+
+        print("SERVER: This is what the server is receiving", data)
+
+        self.update_objects(client.id, data)
+
+    def receive_from_client_state(self, client):
+        buffer_size = 4096  # Adjust buffer size if needed
+        json_data = client.client.recv(buffer_size).decode('utf-8')  # Receive as bytes, decode to string
+        data = json.loads(json_data)  # Deserialize JSON string into Python data
+
+        print("SERVER: received data (state)", data)
+
+        return data
+
+    def update_objects(self, client_id, pressed_keys):
+        player = self.find_player_by_id(client_id)
+        self.pressed_keys[client_id] = pressed_keys  # Update which keys this client is pressing
+        print(self.pressed_keys)
+
+        print("SERVER: Received keys:", pressed_keys, "for player", player.id)  # Enhanced logging
+        
+        if player:
+            if pressed_keys == ['idle']:
+                player.action = 'idle'
+
+            # 1. Apply Movement
+            if "left" in pressed_keys:
+                player.move_left()
+                player.action = 'run'
+                player.direction = 'left'  # Add direction attribute
+
+            if "right" in pressed_keys:
+                player.move_right()
+                player.action = 'run'
+                player.direction = 'right'  # Add direction attribute
+
+            # print("PLAYER: Ground Flag ", player.on_ground)
+
+            if "up" in self.pressed_keys[client_id]:  # Check if 'up' is being held down
+                player.jump()
+                player.action = 'run'
+
+            # 3. Apply Gravity (conditionally)
+            if not player.on_ground:
+                player.apply_gravity()
+
+            # # 4. Handle Collisions
+            player.handle_collisions(self.platforms)  # Assuming you have a list of platforms
+
+            # 5. Update Rope (if it exists)
+            if self.rope:
+                self.rope.update()
+
+            for lava in self.lavaBlocks:
+                lava.update()
+
+            self.BiglavaBlock.update()
+            
+
+    def find_player_by_id(self, client_id):
+        for player in self.players:
+            if player.id == client_id:
+                return player
+        return None  # Return None if no matching player is found
+
 
     def CreateBigLavaBlock(self):
         self.BiglavaBlock = Lava(99, 0, 848, 1000, 1000)
@@ -143,93 +285,6 @@ class Server:
                     platforms.append(block_rect)
 
         return platforms
-
-    def add_client_handler(self, client_handler):
-        with self.lock:
-            self.client_handlers.append(client_handler)
-
-    def remove_client_handler(self, client_handler):
-        with self.lock:
-            if client_handler in self.client_handlers:
-                self.client_handlers.remove(client_handler)
-                print(f"Client {client_handler.address} disconnected")
-
-    def broadcast_to_client(self, client):
-        gameState = {
-            'Players': self.players,
-            'Rope': self.rope,
-            'Lava': self.lavaBlocks,
-            'LavaBlock': self.BiglavaBlock
-        }
-
-        data = pickle.dumps(gameState)
-        client.sendall(data)
-
-    def broadcast_state_to_client(self, client, data):
-        state = pickle.dumps(data)
-        client.sendall(state)
-
-    def receive_from_client_update(self, obj):
-        data = pickle.loads(obj.client.recv(4096))
-        if data:
-            # Update game objects based on received data
-            # This is where you would update player positions, etc.
-            self.update_objects(obj.id, data)
-
-    def receive_from_client_state(self, obj):
-        data = pickle.loads(obj.client.recv(4096))
-        return data
-
-    def update_objects(self, client_id, pressed_keys):
-        player = self.find_player_by_id(client_id)
-        self.pressed_keys[client_id] = pressed_keys  # Update which keys this client is pressing
-        print(self.pressed_keys)
-
-        print("SERVER: Received keys:", pressed_keys, "for player", player.id)  # Enhanced logging
-        
-        if player:
-            if pressed_keys == ['idle']:
-                player.action = 'idle'
-
-            # 1. Apply Movement
-            if "left" in pressed_keys:
-                player.move_left()
-                player.action = 'run'
-                player.direction = 'left'  # Add direction attribute
-
-            if "right" in pressed_keys:
-                player.move_right()
-                player.action = 'run'
-                player.direction = 'right'  # Add direction attribute
-
-            print("PLAYER: Ground Flag ", player.on_ground)
-
-            if "up" in self.pressed_keys[client_id]:  # Check if 'up' is being held down
-                player.jump()
-                player.action = 'run'
-
-            # 3. Apply Gravity (conditionally)
-            if not player.on_ground:
-                player.apply_gravity()
-
-            # # 4. Handle Collisions
-            player.handle_collisions(self.platforms)  # Assuming you have a list of platforms
-
-            # 5. Update Rope (if it exists)
-            if self.rope:
-                self.rope.update()
-
-            for lava in self.lavaBlocks:
-                lava.update()
-
-            self.BiglavaBlock.update()
-            
-
-    def find_player_by_id(self, client_id):
-        for player in self.players:
-            if player.id == client_id:
-                return player
-        return None  # Return None if no matching player is found
 
 
 # if __name__ == '__main__':

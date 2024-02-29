@@ -28,7 +28,7 @@ class ClientHandler:
         ClientHandler.client_count += 1
 
     def add_player(self, id, character_name):
-        player = Player(id, character_name, 'idle', 'right', (200 if id == 0 else 100), 300, 50, 50,
+        player = Player(id, character_name, 'idle', 'right', (200 if id == 0 else 100), 350, 50, 50,
                         (255, 0, 255 if id == 0 else 255, 200, 255))
         self.server.players.append(player)
 

@@ -36,7 +36,9 @@ class GameLogicScreen:
         print("GameLogicClass: Data Received:", data)  # Enhanced logging
 
         self.players = data['Players']
+
         self.rope = data['Rope']
+
         if 'Lava' in data:
             self.lavaBlocks = data['Lava']
         if 'LavaBlock' in data:

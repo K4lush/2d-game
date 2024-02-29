@@ -76,8 +76,6 @@ class JoinGameScreen:
                     if self.start_server.rect.collidepoint(pygame.mouse.get_pos()):
                         self.create_server = True
 
-
-
             self.ip_input.update(event)
             self.port_input.update(event)
 
@@ -86,7 +84,7 @@ class JoinGameScreen:
 
 
     def update(self):
-        print(self.current_state)
+        # print(self.current_state)
 
         if self.create_server:
             ip_address = self.ip_input_Server.get_text()

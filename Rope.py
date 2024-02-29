@@ -8,7 +8,6 @@ class Rope:
         self.thickness = thickness
         self.color = color
 
-
     def update(self):
         # 1. Calculate Distance and Direction
         dx = self.player2.x - self.player1.x  # Difference in x coordinates
@@ -32,6 +31,16 @@ class Rope:
             self.player1.update_rect()
             self.player2.x -= direction_x * pull_amount / 2
             self.player2.update_rect()
+            # Apply pull to each player if they are not on the ground
+            if not self.player1.on_ground:
+                self.player1.x += direction_x * pull_amount / 2
+                self.player1.y += direction_y * pull_amount / 2
+                self.player1.update_rect()
+
+            if not self.player2.on_ground:
+                self.player2.x -= direction_x * pull_amount / 2
+                self.player2.y -= direction_y * pull_amount / 2
+                self.player2.update_rect()
 
     def draw(self, screen, offset_x=0, offset_y=0):
         # start_pos = (self.player1.x + self.player1.width // 2, self.player1.y + self.player1.height // 2)

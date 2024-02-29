@@ -212,6 +212,8 @@ class Server:
             if not player.on_ground:
                 player.apply_gravity()
 
+
+
             # # 4. Handle Collisions
             player.handle_collisions(self.platforms)  # Assuming you have a list of platforms
 

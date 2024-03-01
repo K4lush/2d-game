@@ -2,7 +2,7 @@ import pygame
 import time
 
 class Player:
-    def __init__(self, id, character, action, direction, x, y, width, height, colour, speed=5):
+    def __init__(self, id, character, action, direction, x, y, width, height, colour, speed=5, collision=False):
         self.id = id
         self.character = character
         self.action = action
@@ -13,6 +13,7 @@ class Player:
         self.height = height
         self.colour = colour
         self.speed = speed
+        self.collision = collision
         self.rect = pygame.Rect(x, y, width, height)
         self.is_jumping = False
         self.on_ground = False  # Initialize the on_ground flag
@@ -43,6 +44,7 @@ class Player:
             'y': self.y,
             'rect_centerx': self.rect.centerx,  # Add rect.centerx
             'rect_centery': self.rect.centery,  # Add rect.centery
+            'collision':self.collision,
             # ... other necessary attributes ...
         }
 
@@ -118,7 +120,8 @@ class Player:
         self.x = self.rect.x
         self.y = self.rect.y
     def handleLavaCollisions(self,lavaBLocks):
-        pass
+        if self.y + self.height >= lavaBLocks[0].y:
+            self.collision = True
 
     def move_left(self):
         self.x -= self.speed

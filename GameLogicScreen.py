@@ -15,6 +15,11 @@ class GameLogicScreen:
         self.rope = None
         self.lavaBlocks = []
         self.BigLavaBlock = None
+        self.gameOver = False
+        self.screen_width = 800
+        self.screen_height = 600
+        self.font_size = 30
+        self.alpha_value = 0
 
         ### ROPE VALUES TO BE MOVED ###
         self.player1 = None
@@ -23,6 +28,22 @@ class GameLogicScreen:
         self.end_pos = None
         self.distance = None
         self.rope_color = None
+        self.lavaData = None
+        self.flag = None
+
+
+    def fade_in_game_over(self, screen):
+            print("method called")
+            font = pygame.font.Font(None, self.font_size)
+            text = font.render("GAME OVER", True, (255, 255, 255))
+            text_width, text_height = font.size("GAME OVER")
+            if text_width < self.screen_width and text_height < self.screen_height:
+                self.font_size += 5  # Increase the font size
+            self.alpha_value += 5  # Increase the alpha value
+            if self.alpha_value > 255:
+                self.alpha_value = 255  # Ensure alpha doesn't exceed 255
+            text.set_alpha(self.alpha_value)
+            screen.blit(text, ((self.screen_width - text_width) // 2, (self.screen_height - text_height) // 2))  # Center the text
 
 
     def handle_event(self, keys):
@@ -46,19 +67,21 @@ class GameLogicScreen:
 
     def update(self, data):
         print("GameLogicClass: Data Received:", data)  # Enhanced logging
-
-        if 'Players' in data:
+        if self.settings.gameOver is True:
+            print("gameOver in gameLogicScreen")
+            self.gameOver = True
+        if 'Players' in data and data['Players'] is not None:
             self.players = data['Players']
 
         if 'Rope' in data and data['Rope'] is not None:
-            # self.rope = data['Rope']
+            self.rope = True
             # Extract player data
             self.player1 = data['Players'][0]
             self.player2 = data['Players'][1]
 
             # Calculate start and end positions using player data
-            self.start_pos = (self.player1['x'], self.player1['y'])
-            self.end_pos = (self.player2['x'], self.player2['y'])
+            self.start_pos = (self.player1['rect_centerx'], self.player1['rect_centery'])
+            self.end_pos = (self.player2['rect_centerx'], self.player2['rect_centery'])
 
             self.rope_color = data['Rope']['color']
 
@@ -67,13 +90,23 @@ class GameLogicScreen:
 
 
         if 'Lava' in data:
-            self.lavaBlocks = data['Lava']
+            self.lavaData = data['Lava']
         if 'LavaBlock' in data:
-            self.BigLavaBlock = data['LavaBlock']
-            self.settings.updateLavaBlock(self.BigLavaBlock)
+            self.BigLavaBlock  = data['LavaBlock']
+        if 'Flag' in data:
+            self.flag = data['Flag']
+           
+            
 
+
+
+
+
+        
         self.settings.update_player_sprite(self.players)
-        self.settings.updateLavaSprites(self.lavaBlocks)
+        self.settings.updateLavaSprites(self.lavaData)
+        self.settings.updateLavaBlock(self.BigLavaBlock)
+        self.settings.updateFlagSprites(self.flag)
 
 
 
@@ -121,24 +154,71 @@ class GameLogicScreen:
                     sprite.draw(screen, (player['x'] - camera_offset_x, player['y'] - camera_offset_y))
 
         if self.rope:
-            pygame.draw.line(screen, self.rope_color, self.start_pos, self.end_pos)
+            # Calculate updated positions with camera offset
+            updated_start_pos = (self.start_pos[0] - camera_offset_x, self.start_pos[1] - camera_offset_y)
+            updated_end_pos = (self.end_pos[0] - camera_offset_x, self.end_pos[1] - camera_offset_y)
+
+            # Calculate distance
+            distance = math.sqrt(
+                (updated_start_pos[0] - updated_end_pos[0]) ** 2 + (updated_start_pos[1] - updated_end_pos[1]) ** 2)
+
+            # Dynamic color based on tension
+            max_length = 150  # Hardcoded max length value
+            color_intensity = 255 if distance >= max_length else min(255, max(0, 155 + int(distance / 2)))
+            rope_color = (color_intensity, color_intensity // 2, 0)
+
+            # Generate Bezier curve points
+            curve_points = []
+            if distance < max_length:
+                curve_intensity = max(0, min(50, 100 - (distance / max_length) * 100))
+                control_point1 = (updated_start_pos[0], updated_start_pos[1] + curve_intensity)
+                control_point2 = (updated_end_pos[0], updated_end_pos[1] + curve_intensity)
+                for t in range(0, 101, 5):
+                    t /= 100
+                    bx = (1 - t) ** 3 * updated_start_pos[0] + 3 * (1 - t) ** 2 * t * control_point1[0] + 3 * (
+                                1 - t) * t ** 2 * control_point2[0] + t ** 3 * updated_end_pos[0]
+                    by = (1 - t) ** 3 * updated_start_pos[1] + 3 * (1 - t) ** 2 * t * control_point1[1] + 3 * (
+                                1 - t) * t ** 2 * control_point2[1] + t ** 3 * updated_end_pos[1]
+                    curve_points.append((bx, by))
+
+            # Draw bezier curve or straight line
+            if distance >= max_length or len(curve_points) < 2:
+                pygame.draw.line(screen, rope_color, updated_start_pos, updated_end_pos, 5)
+            else:
+                pygame.draw.lines(screen, rope_color, False, curve_points, 5)
+            #pygame.display.flip()
+            
 
 
-        if self.lavaBlocks:
-            for lava in self.lavaBlocks:
-                sprite_key = f'{lava.id}'
+        if self.flag:
+            id = self.flag['id']
+            action = self.flag['action']
+            key = f'{id}_{action}'
+            if key in self.settings.flagSpritesDict:
+                sprite = self.settings.flagSpritesDict[key]
+                sprite.draw(screen, (self.flag['x']- camera_offset_x, self.flag['y']- camera_offset_y))
+
+
+        if self.lavaData:
+            for lava in self.lavaData:
+                sprite_key = lava['lavaX']
                 if sprite_key in self.settings.lava_sprites:
                     sprite = self.settings.lava_sprites[sprite_key]
-                    sprite.draw(screen, (lava.x - camera_offset_x, lava.y - camera_offset_y))
+                    sprite.draw(screen, (lava['lavaX'] - camera_offset_x, lava['lavaY'] - camera_offset_y))
                     # sprite.draw(screen, (lava.x - camera_offset_x, lava.y - camera_offset_y))
+
+
         if self.BigLavaBlock is not None:
-            key = self.BigLavaBlock.id
+            key = self.BigLavaBlock['lavaX'] - 999
             if key in self.settings.lava_sprites:
                 sprite = self.settings.lava_sprites[key]
                 # sprite.draw(screen, (self.BigLavaBlock.x - camera_offset_x, self.BigLavaBlock.y - camera_offset_y))
-                sprite.draw(screen, (self.BigLavaBlock.x - camera_offset_x, self.BigLavaBlock.y - camera_offset_y))
+                sprite.draw(screen, (self.BigLavaBlock['lavaX'] - camera_offset_x, self.BigLavaBlock['lavaY'] - camera_offset_y))
 
-
+        print("this is self.gameOver",self.gameOver)
+        if self.gameOver is True:
+            print("calling method")
+            self.fade_in_game_over(screen)
 
 
 

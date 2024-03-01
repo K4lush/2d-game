@@ -36,7 +36,7 @@ class Client:
         if self.current_state == "PLAYING":
             incoming_game_state = self.receiveFromServer()
 
-            print("CLIENT: This is what the Client is receiving", incoming_game_state)
+            #print("CLIENT: This is what the Client is receiving", incoming_game_state)
 
             self.game_logic.update(incoming_game_state)
 
@@ -89,9 +89,9 @@ class Client:
 
             outgoing_game_state = self.game_logic.handle_event(keys)
 
-            print("TYPE OF GAME STATE ELEMENTS:", [type(x) for x in outgoing_game_state])
+            #print("TYPE OF GAME STATE ELEMENTS:", [type(x) for x in outgoing_game_state])
 
-            print("THIS IS WHAT THE CLIENT IS SENDING", outgoing_game_state)
+            #print("THIS IS WHAT THE CLIENT IS SENDING", outgoing_game_state)
             self.sendToServer(outgoing_game_state)
 
     def render(self):

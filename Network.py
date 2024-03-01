@@ -19,7 +19,7 @@ class Network:
 
     def connect(self):
         try:
-            print(self.addr)
+            #print(self.addr)
             self.client.connect(self.addr)
         except pickle.UnpicklingError as pe:
             print(f"Pickle Unpickling Error: {pe}")
@@ -42,7 +42,7 @@ class Network:
 
             self.client.sendall(json_data.encode())  # Send the JSON string directly
 
-            print("NETWORK: Sending data...", data)
+            #print("NETWORK: Sending data...", data)
 
         except socket.error as e:
             print(e)
@@ -69,13 +69,13 @@ class Network:
         try:
             buffer_size = 4096
             received_data = self.client.recv(buffer_size).decode('utf-8')  # Receive the raw data
-            print("NETWORK: Raw Data Received:", received_data)  # Inspect this!
+            #print("NETWORK: Raw Data Received:", received_data)  # Inspect this!
 
             # json_data = received_data.decode('utf-8')
 
             data = json.loads(received_data)
 
-            print("NETWORK: Data Received:", received_data)  # Inspect this!
+            #print("NETWORK: Data Received:", received_data)  # Inspect this!
 
 
             return data

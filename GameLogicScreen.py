@@ -1,6 +1,7 @@
 import pygame
 import pickle
 from Lava import Lava
+from Rope import Rope
 from Settings import Settings
 
 import math
@@ -51,20 +52,18 @@ class GameLogicScreen:
             self.players = data['Players']
 
         if 'Rope' in data and data['Rope'] is not None:
-            # self.rope = data['Rope']
-            # Extract player data
+            self.rope = True
             self.player1 = data['Players'][0]
             self.player2 = data['Players'][1]
 
-            # Calculate start and end positions using player data
-            self.start_pos = (self.player1['x'], self.player1['y'])
-            self.end_pos = (self.player2['x'], self.player2['y'])
+            self.start_pos = (self.player1['rect_centerx'], self.player1['rect_centery'])
+            self.end_pos = (self.player2['rect_centerx'], self.player2['rect_centery'])
 
             self.rope_color = data['Rope']['color']
 
             # Calculate distance
             self.distance = math.sqrt((self.start_pos[0] - self.end_pos[0]) ** 2 + (self.start_pos[1] - self.end_pos[1]) ** 2)
-
+            print("Rope Start:", self.start_pos, "End:", self.end_pos, "Color:", self.rope_color)
 
         if 'Lava' in data:
             self.lavaBlocks = data['Lava']
@@ -120,8 +119,7 @@ class GameLogicScreen:
                     sprite = self.settings.player_sprites[sprite_key]
                     sprite.draw(screen, (player['x'] - camera_offset_x, player['y'] - camera_offset_y))
 
-        if self.rope:
-            pygame.draw.line(screen, self.rope_color, self.start_pos, self.end_pos)
+
 
 
         if self.lavaBlocks:
@@ -138,11 +136,42 @@ class GameLogicScreen:
                 # sprite.draw(screen, (self.BigLavaBlock.x - camera_offset_x, self.BigLavaBlock.y - camera_offset_y))
                 sprite.draw(screen, (self.BigLavaBlock.x - camera_offset_x, self.BigLavaBlock.y - camera_offset_y))
 
+        if self.rope:
+            # Calculate updated positions with camera offset
+            updated_start_pos = (self.start_pos[0] - camera_offset_x, self.start_pos[1] - camera_offset_y)
+            updated_end_pos = (self.end_pos[0] - camera_offset_x, self.end_pos[1] - camera_offset_y)
 
+            # Calculate distance
+            distance = math.sqrt(
+                (updated_start_pos[0] - updated_end_pos[0]) ** 2 + (updated_start_pos[1] - updated_end_pos[1]) ** 2)
 
+            # Dynamic color based on tension
+            max_length = 150  # Hardcoded max length value
+            color_intensity = 255 if distance >= max_length else min(255, max(0, 155 + int(distance / 2)))
+            rope_color = (color_intensity, color_intensity // 2, 0)
 
+            # Generate Bezier curve points
+            curve_points = []
+            if distance < max_length:
+                curve_intensity = max(0, min(50, 100 - (distance / max_length) * 100))
+                control_point1 = (updated_start_pos[0], updated_start_pos[1] + curve_intensity)
+                control_point2 = (updated_end_pos[0], updated_end_pos[1] + curve_intensity)
+                for t in range(0, 101, 5):
+                    t /= 100
+                    bx = (1 - t) ** 3 * updated_start_pos[0] + 3 * (1 - t) ** 2 * t * control_point1[0] + 3 * (
+                                1 - t) * t ** 2 * control_point2[0] + t ** 3 * updated_end_pos[0]
+                    by = (1 - t) ** 3 * updated_start_pos[1] + 3 * (1 - t) ** 2 * t * control_point1[1] + 3 * (
+                                1 - t) * t ** 2 * control_point2[1] + t ** 3 * updated_end_pos[1]
+                    curve_points.append((bx, by))
 
+            # Draw bezier curve or straight line
+            if distance >= max_length or len(curve_points) < 2:
+                pygame.draw.line(screen, rope_color, updated_start_pos, updated_end_pos, 5)
+            else:
+                pygame.draw.lines(screen, rope_color, False, curve_points, 5)
 
+            # Don't forget to update the display
+        pygame.display.flip()
 
 
 

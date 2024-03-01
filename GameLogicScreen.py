@@ -1,6 +1,7 @@
 import pygame
 import pickle
 from Lava import Lava
+from Rope import Rope
 from Settings import Settings
 
 import math
@@ -87,7 +88,7 @@ class GameLogicScreen:
 
             # Calculate distance
             self.distance = math.sqrt((self.start_pos[0] - self.end_pos[0]) ** 2 + (self.start_pos[1] - self.end_pos[1]) ** 2)
-
+            print("Rope Start:", self.start_pos, "End:", self.end_pos, "Color:", self.rope_color)
 
         if 'Lava' in data:
             self.lavaData = data['Lava']

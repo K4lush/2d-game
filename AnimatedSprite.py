@@ -2,32 +2,44 @@ import pygame
 
 
 class AnimatedSprite:
-    def __init__(self, images, frame_rate, initially_flipped=False):
+    def __init__(self, images, frame_rate, initially_flipped=False, lava=None):
         self.original_images = images
         self.images = images[:]
         self.frame_rate = frame_rate
         self.current_frame = 0
         self.last_update = pygame.time.get_ticks()
         self.flipped = initially_flipped
+        self.lava = lava    
         self.died_state_started = False  # Initialize the 'died' state tracker
         self.animation_completed = False
+        self.completed_once = False
+        
 
         if self.flipped:
             self.flip_images()
 
-    def update(self):
+    def update(self, action=None):
         now = pygame.time.get_ticks()
         if now - self.last_update > self.frame_rate:
             self.last_update = now
             self.current_frame = (self.current_frame + 1) % len(self.images)
+            print("this is action: ",action)
+            if action == 'died':
+                    print("Action is died in sprite class")
+                    if self.died_state_started and not self.completed_once:
+                        self.animation_completed = True
+                        self.completed_once = True
+                        print("game over in animated sprite class", self.completed_once)
 
-    # def draw(self, surface, position):
-    #     frame = self.images[self.current_frame]
-    #     surface.blit(frame, position)
 
+   
     def draw(self, surface, position, offset_x=0, offset_y=0):
         print(offset_y, offset_x)
         # Apply the offset to the position
+        # if self.lava is None:
+        #     offset_position = (position[0] - offset_x, position[1] - offset_y)
+        # elif self.lava is not None:
+        #     offset_position = (self.lava[0] - offset_x, self.lava[1] - offset_y)
         offset_position = (position[0] - offset_x, position[1] - offset_y)
         # Draw the current frame of the animation on the given surface.
         frame = self.images[self.current_frame]

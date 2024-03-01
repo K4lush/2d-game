@@ -15,6 +15,7 @@ from Player import Player
 from Settings import Settings
 from MapServer import MapServer
 from Lava import Lava
+from Flag import Flag
 
 from Rope import Rope
 
@@ -111,10 +112,14 @@ class Server:
         self.rope_data = None
         self.players = []
         self.lavaBlocks = []
+        self.lavaData = []
         self.BiglavaBlock = None
+        self.lavaColl = False
+        self.flag = None
         self.CreateLava()
         self.platforms = self.create_platform_rects()  # Create platform rects
         self.CreateBigLavaBlock()
+        self.createFlag()
 
         # self.start_server()
 
@@ -139,6 +144,8 @@ class Server:
     #         if client_handler.ready:
     #             print(f"SERVER: Broadcasting client {client_handler.id}")
     #             self.broadcast_to_client(client_handler.client)
+    def createFlag(self):
+        self.flag = Flag('flag', 300 , 300, 50, 50, 'gotten')
 
     def add_client_handler(self, client_handler):
         with self.lock:
@@ -154,12 +161,32 @@ class Server:
 
         if self.rope:
             self.rope_data = self.rope.to_json()
+            print("H")
+
+        block = self.BiglavaBlock.to_json()
+        flag = self.flag.to_json()
+
+        # if self.lavaBlocks:
+        #     for lava in self.lavaBlocks:
+        #         # self.lavaData.append((lava.x,lava.y).to_json())
+        #         self.lavaData.append(lava.to_json())
+            
+        #         print("HH")
 
         gameState = {
             # 'Players': self.players,
             'Players': [player.to_json() for player in self.players], # Serialize players
+            
 
             'Rope': self.rope_data,
+
+            'Lava': [lava.to_json() for lava in self.lavaBlocks],
+
+            'LavaBlock':block,
+
+            'Flag':flag
+
+
             # 'Lava': self.lavaBlocks,
             # 'LavaBlock': self.BiglavaBlock
         }
@@ -170,11 +197,11 @@ class Server:
         #
         # client.sendall(data)
 
-        print("SERVER: GameState being prepared:", gameState)
+        #print("SERVER: GameState being prepared:", gameState)
 
         data = json.dumps(gameState)
 
-        print("SERVER: Sending data (once encoded):", data)
+        #print("SERVER: Sending data (once encoded):", data)
 
         client.send(data.encode())
 
@@ -192,7 +219,7 @@ class Server:
         data = json.loads(json_data)  # Deserialize JSON string into Python data
 
 
-        print("SERVER: This is what the server is receiving", data)
+       # print("SERVER: This is what the server is receiving", data)
 
         self.update_objects(client.id, data)
 
@@ -201,7 +228,7 @@ class Server:
         json_data = client.client.recv(buffer_size).decode('utf-8')  # Receive as bytes, decode to string
         data = json.loads(json_data)  # Deserialize JSON string into Python data
 
-        print("SERVER: received data (state)", data)
+        #print("SERVER: received data (state)", data)
 
         return data
 
@@ -210,7 +237,7 @@ class Server:
         self.pressed_keys[client_id] = pressed_keys  # Update which keys this client is pressing
         print(self.pressed_keys)
 
-        print("SERVER: Received keys:", pressed_keys, "for player", player.id)  # Enhanced logging
+        #print("SERVER: Received keys:", pressed_keys, "for player", player.id)  # Enhanced logging
         
         if player:
             if pressed_keys == ['idle']:
@@ -239,15 +266,22 @@ class Server:
 
             # # 4. Handle Collisions
             player.handle_collisions(self.platforms)  # Assuming you have a list of platforms
-
+            player.handleLavaCollisions(self.lavaBlocks)
             # 5. Update Rope (if it exists)
             if self.rope:
                 self.rope.update()
 
-            for lava in self.lavaBlocks:
-                lava.update()
+            if not self.lavaColl:
+                for lava in self.lavaBlocks:
+                    lava.update()
+                self.BiglavaBlock.update()
 
-            self.BiglavaBlock.update()
+
+            if player.collision:
+                player.action = 'died'
+                self.lavaColl = True
+
+            
             
 
     def find_player_by_id(self, client_id):
@@ -258,13 +292,13 @@ class Server:
 
 
     def CreateBigLavaBlock(self):
-        self.BiglavaBlock = Lava(99, 0, 848, 1000, 1000)
+        self.BiglavaBlock = Lava(99, -480, 960, 2000, 2000)
 
     def CreateLava(self):
-        for i in range(20):
+        for i in range(10):
             ##each lava width is 48 pixels, so draw every 48 pixels accross screen.
             ## we want to draw them 64*however many blocks depths we have in self.map in order for the lava to spawn at bottom of map
-            lava = Lava(i, i * 48, 800, 48, 48)
+            lava = Lava(i, (i * 160)-480, 800, 160, 160)
             self.lavaBlocks.append(lava)
 
     def create_rope_if_needed(self):

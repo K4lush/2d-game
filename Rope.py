@@ -34,7 +34,7 @@ class Rope:
             self.player2.update_rect()
 
     def draw(self, screen, offset_x=0, offset_y=0):
-        start_pos = (self.player1.rect.centerx - offset_x, self.player1.rect.centery - offset_y)
+        # start_pos = (self.player1.rect.centerx - offset_x, self.player1.rect.centery - offset_y)
         end_pos = (self.player2.rect.centerx - offset_x, self.player2.rect.centery - offset_y)
         distance = math.sqrt((start_pos[0] - end_pos[0]) ** 2 + (start_pos[1] - end_pos[1]) ** 2)
 
@@ -56,7 +56,7 @@ class Rope:
                      control_point2[1] + t ** 3 * end_pos[1]
                 curve_points.append((bx, by))
 
-        # Draw Bezier curve or straight line
+        # Draw r curve or straight line
         if distance >= self.max_length or len(curve_points) < 2:
             pygame.draw.line(screen, rope_color, start_pos, end_pos, self.thickness)
         else:

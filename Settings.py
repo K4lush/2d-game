@@ -2,7 +2,7 @@ import pygame
 
 from AnimatedSprite import AnimatedSprite
 from PlatformObjects import StillObjects
-
+from Music import MusicPlayer
 
 class Settings:
     def __init__(self):
@@ -31,6 +31,11 @@ class Settings:
         self.lavaBlockSprite = self.loadLavaBlockSprite()
         self.background_image = None  # Add this line to initialize the background image attribute
         self.load_background_image()  # Call the method to load the background image
+        self.music_enabled = True  # Default value
+        self.music_volume = 0.5  # Default volume (0.0 to 1.0)
+        self.music_file_path = 'Game_music.mp3'  # Default music file path
+        self.music_player = None  # Placeholder for a MusicPlayer instance
+
 
     def loadLavaBlockSprite(self):
         lavaSheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
@@ -147,7 +152,7 @@ class Settings:
 
     def update_player_sprite(self, players):
 
-        #print("SETTINGS: update_player_sprite", players)
+        print("SETTINGS: update_player_sprite", players)
 
         for player in players:
 
@@ -250,8 +255,27 @@ class Settings:
     def load_background_image(self):
         # Specify the path to your background image
         self.png = 'assets/Background/Yellow.png'
-        background_path = self.png  # Replace 'YourBackgroundImage.png' with your actual image file name
+        background_path = self.png
         # Load the image and assign it to the background_image attribute
-        self.background_image = pygame.image.load(background_path).convert_alpha()  # Use convert_alpha() if your image has transparency; otherwise, just use convert()
+        self.background_image = pygame.image.load(background_path).convert_alpha()
         window_size = (800, 600)  # Update these dimensions to match your game window size
         self.background_image = pygame.transform.scale(self.background_image, window_size)
+
+    def load_music(self):
+        if self.music_enabled:
+            self.music_player = MusicPlayer(self.music_file_path)
+            self.music_player.set_volume(self.music_volume)
+            self.music_player.play_music()
+
+    def toggle_music(self):
+        if self.music_player:
+            self.music_player.toggle_music()
+            self.music_enabled = not self.music_enabled  # Update the enabled state
+
+    def set_music_volume(self, volume):
+        if 0.0 <= volume <= 1.0:  # Ensure volume is within a valid range
+            self.music_volume = volume
+            if self.music_player:
+                self.music_player.set_volume(volume)
+
+

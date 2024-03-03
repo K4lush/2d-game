@@ -35,6 +35,7 @@ class AnimatedSprite:
    
     def draw(self, surface, position, offset_x=0, offset_y=0):
         print(offset_y, offset_x)
+        # print(f"Drawing AnimatedSprite at position: {position} with offset: ({offset_x}, {offset_y})")
         # Apply the offset to the position
         # if self.lava is None:
         #     offset_position = (position[0] - offset_x, position[1] - offset_y)

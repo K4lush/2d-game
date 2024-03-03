@@ -1,15 +1,19 @@
 from Button import Button
 # from Game import GameState
-
+import traceback
 import pygame
 
 from text_input import TextInput
 from Button import Button
+from AnimatedSprite import AnimatedSprite
 
 
 class MainMenuScreen:
     def __init__(self, client_script):
         # Default Character if no character is chosen
+        self.background_image = pygame.image.load('assets/Background/Yellow.png').convert()
+        self.background_image = pygame.transform.scale(self.background_image, (800, 600))
+
         self.client = client_script
         self.character = 'NinjaFrog'
 
@@ -64,6 +68,8 @@ class MainMenuScreen:
             (button_height, button_height)  # New width and height
         )
 
+
+
     def handle_event(self, events):
         for event in events:
             if event.type == pygame.QUIT:
@@ -96,6 +102,9 @@ class MainMenuScreen:
 
 
 
+
+
+
     def update(self):
         print("UPDATE: ", self.switch_state)
 
@@ -119,9 +128,13 @@ class MainMenuScreen:
         elif self.virtual_button.highlighted:
             self.last_hovered_character = 'VirtualGuy'
 
+
+
     def render(self, screen):
-        if not self.screen:
-            self.screen = screen
+
+        screen.blit(self.background_image, (0, 0))
+
+
 
         if self.current_state == "MAIN":
             self.start_button.draw(screen)
@@ -148,6 +161,8 @@ class MainMenuScreen:
         # Render the run animation if a character is hovered
         if self.last_hovered_character and self.current_state == 'SHOW CHARACTER':
             self.display_run_animation(self.last_hovered_character, screen)
+
+        # pygame.display.flip()  # Update the display
 
     def display_run_animation(self, character, screen, scale_factor=3):  # Added scale_factor argument
             frames = self.character_sprites[character]['idle']

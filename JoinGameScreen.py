@@ -7,7 +7,7 @@ from Network import Network
 from Server import Server
 from threading import Thread
 from Music import MusicPlayer
-
+from Rope import Rope
 
 import pygame
 
@@ -71,6 +71,27 @@ class JoinGameScreen:
 
         self.music_player = MusicPlayer('Game_music.mp3')
         self.music_player.play_music()  # Add this to test if music plays immediately
+        self.character_sprites = self.load_characters_sprites()
+        self.rope_color = (255, 255, 255)  # White color for the rope
+        self.rope_width = 5  # Width of the rope
+
+        # Load characters sprites (NinjaFrog and MaskDude)
+        self.ninja_frog_sprite = self.character_sprites['NinjaFrog']['idle'][0]  # First frame of idle animation
+        self.mask_dude_sprite = self.character_sprites['MaskDude']['idle'][0]  # First frame of idle animation
+
+        # Sprite positions (adjust as needed)
+        self.ninja_frog_pos = (100, 200)  # (x, y) coordinates
+        self.mask_dude_pos = (300, 200)  # (x, y) coordinates
+
+        self.ninja_frog_frame = 0
+        self.mask_dude_frame = 0
+
+        # Sprite starting positions
+        self.ninja_frog_pos = [100, 200]
+        self.mask_dude_pos = [300, 200]
+
+        # Movement speed
+        self.sprite_speed = 2
 
     def handle_event(self, events):
         for event in events:  # Iterate through the events
@@ -121,6 +142,22 @@ class JoinGameScreen:
 
     def update(self):
         # print(self.current_state)
+        # Update the positions of the sprites
+        self.ninja_frog_pos[0] += self.sprite_speed
+        self.mask_dude_pos[0] += self.sprite_speed
+
+        # Wrap around the screen if they go off the edge
+        screen_width = 800  # Assuming your screen width is 800
+        if self.ninja_frog_pos[0] > screen_width:
+            self.ninja_frog_pos[0] = -self.character_sprites['NinjaFrog']['run'][0].get_width()
+        if self.mask_dude_pos[0] > screen_width:
+            self.mask_dude_pos[0] = -self.character_sprites['MaskDude']['run'][0].get_width()
+
+        # Update animation frames
+        current_time = pygame.time.get_ticks()
+        if current_time % 50 == 0:  # Change frame every 50 milliseconds
+            self.ninja_frog_frame = (self.ninja_frog_frame + 1) % len(self.character_sprites['NinjaFrog']['run'])
+            self.mask_dude_frame = (self.mask_dude_frame + 1) % len(self.character_sprites['MaskDude']['run'])
 
         if self.create_server:
             ip_address = self.ip_input_Server.get_text()
@@ -155,6 +192,17 @@ class JoinGameScreen:
             self.join_button.draw(screen)
             self.host_game.draw(screen)
             self.toggle_music_button.draw(screen)
+            ninja_frog_current_frame = self.character_sprites['NinjaFrog']['run'][self.ninja_frog_frame]
+            mask_dude_current_frame = self.character_sprites['MaskDude']['run'][self.mask_dude_frame]
+
+            # Draw the rope connecting the sprites
+            rope_end_pos = (self.mask_dude_pos[0] + mask_dude_current_frame.get_width() // 2, self.mask_dude_pos[1])
+            pygame.draw.line(screen, self.rope_color, self.ninja_frog_pos, rope_end_pos, self.rope_width)
+
+            # Draw the sprites
+            screen.blit(ninja_frog_current_frame, self.ninja_frog_pos)
+            screen.blit(mask_dude_current_frame, self.mask_dude_pos)
+
 
         elif self.current_state == "JOIN":
             # Draw the input fields and buttons
@@ -179,6 +227,52 @@ class JoinGameScreen:
             self.pause_music_button.draw(screen)
             self.play_music_button.draw(screen)
 
+
+    def load_characters_sprites(self):
+        characters = {
+            'NinjaFrog': {
+                'idle': self.load_animation_frames('NinjaFrog', 'idle', 11),
+                'run': self.load_animation_frames('NinjaFrog', 'run', 12),
+                'died': self.load_animation_frames('NinjaFrog', 'died', 7),
+                # Add more animations for NinjaFrog as needed
+            },
+            'MaskDude': {
+                'idle': self.load_animation_frames('MaskDude', 'idle', 11),
+                'run': self.load_animation_frames('MaskDude', 'run', 12),
+                'died': self.load_animation_frames('MaskDude', 'died', 7),
+                # Add more animations for MaskDude as needed
+            },
+            'PinkMan': {
+                'idle': self.load_animation_frames('PinkMan', 'idle', 11),
+                'run': self.load_animation_frames('PinkMan', 'run', 12),
+                # 'died': self.load_animation_frames('PinkMan', 'died', 7),
+                # Add more animations for NinjaFrog as needed
+            },
+            'VirtualGuy': {
+                'idle': self.load_animation_frames('VirtualGuy', 'idle', 11),
+                'run': self.load_animation_frames('VirtualGuy', 'run', 12),
+                # 'died': self.load_animation_frames('VirtualGuy', 'died', 7),
+                # Add more animations for MaskDude as needed
+            }
+            # Add more characters as needed
+        }
+        return characters
+
+    def load_animation_frames(self, character_folder, action, num_frames,
+                              scale_factor=2):  # Added scale_factor argument
+        path = f'assets/MainCharacters/{character_folder}/{action}.png'
+        sprite_sheet = pygame.image.load(path).convert_alpha()
+        frame_width = sprite_sheet.get_width() // num_frames
+        frame_height = sprite_sheet.get_height()
+
+        frames = []
+        for i in range(num_frames):
+            frame = sprite_sheet.subsurface((i * frame_width, 0, frame_width, frame_height))
+            scaled_frame = pygame.transform.scale(frame, (
+                frame_width * scale_factor, frame_height * scale_factor))  # Scale frame
+            frames.append(scaled_frame)
+
+        return frames
 
 
 

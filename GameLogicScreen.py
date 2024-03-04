@@ -68,14 +68,7 @@ class GameLogicScreen:
         if keys[pygame.K_DOWN]:
             pressed_keys.append("down")
 
-        # Send pressed keys if any, else send 'idle'
-
-        #return pressed_keys if pressed_keys else ['idle']
-    #     if (self.players[0] is not None and self.players[0].action == 'died') or (self.players[1] is not None and self.players[1].action == 'died'):
-    # # Your code here
-
-    #         return ['died']
-    #     else:
+       
         return pressed_keys if pressed_keys else ['idle'] 
         
     def update(self, data):
@@ -144,10 +137,7 @@ class GameLogicScreen:
         else:
             camera_offset_x, camera_offset_y = 0, 0
 
-        # Optional: Clamp the camera_offset values to ensure the camera doesn't move outside your game world bounds
-        # Example clamping (adjust with your game's actual bounds):
-        # camera_offset_x = max(0, min(camera_offset_x, GAME_WORLD_WIDTH - WINDOW_WIDTH))
-        # camera_offset_y = max(0, min(camera_offset_y, GAME_WORLD_HEIGHT - WINDOW_HEIGHT))
+       
 
         return camera_offset_x, camera_offset_y
 
@@ -173,15 +163,16 @@ class GameLogicScreen:
                     if sprite_key in self.settings.player_sprites:  # Make sure the sprite exists
                         sprite = self.settings.player_sprites[sprite_key]
                         sprite.draw(screen, (player['x'] - camera_offset_x, player['y'] - camera_offset_y))
-                # if len(self.players) ==2:
-                #     player1score = self.players[0]['score']
-                #     player2score = self.players[1]['score']
+                if len(self.players) ==2:
+                    print("HERE BOZO")
+                    player1score = self.players[0]['score']
+                    player2score = self.players[1]['score']
 
-                #     score = max(player1score,player2score)
-                #     print("This is score value: ", score)
-                #     my_font = pygame.font.SysFont('Comic Sans MS', 30)
-                #     text_surface = my_font.render(str(score), True, (255, 255, 255))  # Convert score to a string
-                #     screen.blit(text_surface, (20 , 20))  # Use a tuple for coordinates
+                    score = max(player1score,player2score)
+                    print("This is score value: ", score)
+                    my_font = pygame.font.SysFont('Comic Sans MS', 30)
+                    text_surface = my_font.render(str(score), True, (255, 255, 255))  # Convert score to a string
+                    screen.blit(text_surface, (20 , 20))  # Use a tuple for coordinates
 
                 
 

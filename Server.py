@@ -179,24 +179,13 @@ class Server:
         block = self.BiglavaBlock.to_json()
         flag = self.flag.to_json()
 
-        # if self.lavaBlocks:
-        #     for lava in self.lavaBlocks:
-        #         # self.lavaData.append((lava.x,lava.y).to_json())
-        #         self.lavaData.append(lava.to_json())
-            
-        #         print("HH")
+       
             
 
         block = self.BiglavaBlock.to_json()
         flag = self.flag.to_json()
 
-        # if self.lavaBlocks:
-        #     for lava in self.lavaBlocks:
-        #         # self.lavaData.append((lava.x,lava.y).to_json())
-        #         self.lavaData.append(lava.to_json())
-            
-        #         print("HH")
-
+       
         gameState = {
             # 'Players': self.players,
             'Players': [player.to_json() for player in self.players], # Serialize players
@@ -291,7 +280,7 @@ class Server:
             #player.handlePixelPerfectCollisions(self.platforms, self.playerSprites)
             player.handleLavaCollisions(self.lavaBlocks)
             player.hanldeFlagCollision(self.flag)
-            #player.updateScore()
+            player.updateScore()
             print("thsi is player score from server: ",player.score)
             # 5. Update Rope (if it exists)
             if self.rope:

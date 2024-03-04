@@ -40,16 +40,7 @@ class AnimatedSprite:
    
     def draw(self, surface, position, offset_x=0, offset_y=0):
         print(offset_y, offset_x)
-        # print(f"Drawing AnimatedSprite at position: {position} with offset: ({offset_x}, {offset_y})")
-        # Apply the offset to the position
-        # if self.lava is None:
-        #     offset_position = (position[0] - offset_x, position[1] - offset_y)
-        # elif self.lava is not None:
-        #     offset_position = (self.lava[0] - offset_x, self.lava[1] - offset_y)
-        # if self.lava is None:
-        #     offset_position = (position[0] - offset_x, position[1] - offset_y)
-        # elif self.lava is not None:
-        #     offset_position = (self.lava[0] - offset_x, self.lava[1] - offset_y)
+       
         offset_position = (position[0] - offset_x, position[1] - offset_y)
         # Draw the current frame of the animation on the given surface.
         frame = self.images[self.current_frame]

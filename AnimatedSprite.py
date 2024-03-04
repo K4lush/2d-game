@@ -13,7 +13,7 @@ class AnimatedSprite:
         self.died_state_started = False  # Initialize the 'died' state tracker
         self.animation_completed = False
         self.completed_once = False
-        
+        self.flagDone = False
 
         if self.flipped:
             self.flip_images()
@@ -30,7 +30,9 @@ class AnimatedSprite:
                         self.animation_completed = True
                         self.completed_once = True
                         print("game over in animated sprite class", self.completed_once)
-
+            if action == 'gotten':
+                if self.current_frame == len(self.images):
+                    self.flagDone = True
 
    
     def draw(self, surface, position, offset_x=0, offset_y=0):

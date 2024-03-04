@@ -7,22 +7,28 @@ from PlatformObjects import StillObjects
 class Settings:
     def __init__(self):
         self.map = [
-            [1, -1, -1, -1, 1, 1, 1],
-            [1, 1, 1, -1, -1, -1, 1],
-            [1, -1, -1, 1, 1, -1, 1],
-            [1, 1, -1, -1, -1, -1,1],
-            [1, -1, 1, 1, -1, -1, 1],
-            [1, -1, -1, -1, 1, 1, 1],
-            [1, 1, -1, -1, -1, -1,1],  # START
-            [1, -1, 1, 1, -1, -1, 1],
-            [1, -1, -1, -1, 1, 1, 1],
-            [1, 1, 1, -1, -1, -1, 1]
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,1,1,0,0,0,0,0,0,0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         ]
 
         self.platforms = []
         self.player_sprites = {}
         self.lava_sprites = {}
         self.flagSpritesDict = {}
+        self.arrowSpritesDict = {}
         self.gameOver = False
         self.create_blocks_from_map()
         self.character_sprites = self.load_characters_sprites()
@@ -31,6 +37,7 @@ class Settings:
         self.lavaBlockSprite = self.loadLavaBlockSprite()
         self.background_image = None  # Add this line to initialize the background image attribute
         self.load_background_image()  # Call the method to load the background image
+        self.arrowFrames = self.loadArrrowSprites()
 
     def loadLavaBlockSprite(self):
         lavaSheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
@@ -45,6 +52,23 @@ class Settings:
             'ungotten':self.load_flag_animation_frames('ungotten', 1),
         }
         return sprites
+
+    def loadArrrowSprites(self):
+        arrow_sheet = pygame.image.load('assets/Traps/Arrow/Idle.png').convert_alpha()
+      
+        num_frames = 10
+        frame_width = arrow_sheet.get_width() // num_frames
+        frame_height = arrow_sheet.get_height()
+        #frame_offsets = [i * (frame_width + 1) for i in range(num_frames)]
+
+        arrow_frames = []
+        for i in range(num_frames):
+            frame = arrow_sheet.subsurface((i * frame_width, 0, frame_width, frame_height))
+            # scaled_frame = pygame.transform.scale(frame,
+            #                                       (frame_width, frame_height))  # Scale frame by a factor of 3
+            arrow_frames.append(frame)
+
+        return arrow_frames
 
 
 
@@ -76,6 +100,15 @@ class Settings:
                 self.lava_sprites[sprite_key] = AnimatedSprite(frames, frame_rate=50,) #lava=lava )
             sprite = self.lava_sprites[sprite_key]
 
+            sprite.update()
+
+    def updateArrowSprites(self, arrows):
+        for arrow in arrows:
+            sprite_key = arrow['id']
+            if sprite_key not in self.arrowSpritesDict:
+                frames = self.arrowFrames
+                self.arrowSpritesDict[sprite_key] = AnimatedSprite(frames, frame_rate=50,)
+            sprite = self.arrowSpritesDict[sprite_key]
             sprite.update()
 
     def updateLavaBlock(self, lavaBlock):
@@ -208,7 +241,10 @@ class Settings:
             frames = self.flagSprites[action]
             self.flagSpritesDict[spriteKey] = AnimatedSprite(frames, frame_rate=50)
         sprite = self.flagSpritesDict[spriteKey]
-        sprite.update()
+        if sprite.flagDone is True:
+            action = 'idle'
+        sprite.update(action)
+        
 
 
 
@@ -216,7 +252,7 @@ class Settings:
 
     def create_blocks_from_map(self):
         """Creates block objects based on the map data."""
-        tile_size = 68  # Size of each tile
+        tile_size = 34  # Size of each tile    64
         # Assuming self.settings.map is a 2D list indicating the type of tile at each position
         for row_index, row in enumerate(self.map):
             for col_index, tile_type in enumerate(row):

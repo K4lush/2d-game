@@ -2,6 +2,7 @@ import pygame
 
 
 class AnimatedSprite:
+    
     def __init__(self, images, frame_rate, initially_flipped=False, lava=None):
         self.original_images = images
         self.images = images[:]
@@ -9,6 +10,7 @@ class AnimatedSprite:
         self.current_frame = 0
         self.last_update = pygame.time.get_ticks()
         self.flipped = initially_flipped
+        self.lava = lava    
         self.lava = lava    
         self.died_state_started = False  # Initialize the 'died' state tracker
         self.animation_completed = False
@@ -18,6 +20,7 @@ class AnimatedSprite:
         if self.flipped:
             self.flip_images()
 
+    
     def update(self, action=None):
         now = pygame.time.get_ticks()
         if now - self.last_update > self.frame_rate:
@@ -37,7 +40,12 @@ class AnimatedSprite:
    
     def draw(self, surface, position, offset_x=0, offset_y=0):
         print(offset_y, offset_x)
+        # print(f"Drawing AnimatedSprite at position: {position} with offset: ({offset_x}, {offset_y})")
         # Apply the offset to the position
+        # if self.lava is None:
+        #     offset_position = (position[0] - offset_x, position[1] - offset_y)
+        # elif self.lava is not None:
+        #     offset_position = (self.lava[0] - offset_x, self.lava[1] - offset_y)
         # if self.lava is None:
         #     offset_position = (position[0] - offset_x, position[1] - offset_y)
         # elif self.lava is not None:

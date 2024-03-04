@@ -3,6 +3,7 @@ import time
 
 class Player:
     def __init__(self, id, character, action, direction, x, y, width, height, colour, speed=5, collision=False):
+    def __init__(self, id, character, action, direction, x, y, width, height, colour, speed=5, collision=False):
         self.id = id
         self.character = character
         self.action = action
@@ -14,6 +15,7 @@ class Player:
         self.height = height
         self.colour = colour
         self.speed = speed
+        self.collision = collision
         self.collision = collision
         self.rect = pygame.Rect(x, y, width, height)
         self.is_jumping = False

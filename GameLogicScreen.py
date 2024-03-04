@@ -21,6 +21,11 @@ class GameLogicScreen:
         self.screen_height = 600
         self.font_size = 30
         self.alpha_value = 0
+        self.gameOver = False
+        self.screen_width = 800
+        self.screen_height = 600
+        self.font_size = 30
+        self.alpha_value = 0
 
         ### ROPE VALUES TO BE MOVED ###
         self.player1 = None
@@ -78,14 +83,18 @@ class GameLogicScreen:
         if self.settings.gameOver is True:
             print("gameOver in gameLogicScreen")
             self.gameOver = True
+       
+        
         if 'Players' in data and data['Players'] is not None:
             self.players = data['Players']
 
         if 'Rope' in data and data['Rope'] is not None:
             self.rope = True
+            # Extract player data
             self.player1 = data['Players'][0]
             self.player2 = data['Players'][1]
 
+            # Calculate start and end positions using player data
             self.start_pos = (self.player1['rect_centerx'], self.player1['rect_centery'])
             self.end_pos = (self.player2['rect_centerx'], self.player2['rect_centery'])
 
@@ -96,6 +105,7 @@ class GameLogicScreen:
             print("Rope Start:", self.start_pos, "End:", self.end_pos, "Color:", self.rope_color)
 
         if 'Lava' in data:
+            self.lavaData = data['Lava']
             self.lavaData = data['Lava']
         if 'LavaBlock' in data:
             self.BigLavaBlock  = data['LavaBlock']

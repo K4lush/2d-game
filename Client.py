@@ -9,6 +9,7 @@ from MainMenuScreen import MainMenuScreen
 from LoadingScreen import LoadingScreen
 from GameLogicScreen import GameLogicScreen
 
+
 class Client:
     SCREEN = pygame.display.set_mode((800, 400))
     BG_COLOR = (207, 185, 151)  # Background color
@@ -26,11 +27,14 @@ class Client:
         self.current_state = 'JOIN MENU'
 
     def run(self):
+        print("Game loop started")
         while True:
+            print(f"Current state: {self.current_state}")  # Check current state at each iteration
             self.update()
             self.render()
             self.handle_events()
-            self.clock.tick(60)  # Limit to 60 FPS
+            self.main_menu.render(self.screen)
+            self.clock.tick(60)
 
     def update(self):
         if self.current_state == "PLAYING":
@@ -70,6 +74,7 @@ class Client:
         # Handle events outside of the loop, affecting global behavior as needed
         for event in events:
             if event.type == pygame.QUIT:
+                print("Quit event received")
                 pygame.quit()
                 exit()
 
@@ -94,21 +99,21 @@ class Client:
             #print("THIS IS WHAT THE CLIENT IS SENDING", outgoing_game_state)
             self.sendToServer(outgoing_game_state)
 
+
     def render(self):
-        self.screen.fill((90, 90, 90))  # Sample background color
+        print("Rendering...")
+        self.screen.fill(self.BG_COLOR)  # Use the background color variable
 
         if self.current_state == "PLAYING":
+            print("Rendering PLAYING state")
             self.game_logic.render(self.screen)
-
-        if self.current_state == "JOIN MENU":
+        elif self.current_state == "JOIN MENU":
+            print("Rendering JOIN MENU state")
             self.join_menu.render(self.screen)
-
-        if self.current_state == "MAIN MENU":
+        elif self.current_state == "MAIN MENU":
+            print("Rendering MAIN MENU state")
             self.main_menu.render(self.screen)
-
-        if self.current_state == "LOADING SCREEN":
-            self.loading_screen.render(self.screen)
-        # ... Add more elif blocks for other states
+        # Continue for other states as necessary
 
         pygame.display.flip()
 

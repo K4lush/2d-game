@@ -114,7 +114,10 @@ class Server:
         self.players = []
         self.lavaBlocks = []
         self.lavaData = []
+        self.lavaData = []
         self.BiglavaBlock = None
+        self.lavaColl = False
+        self.flag = None
         self.lavaColl = False
         self.flag = None
         self.CreateLava()
@@ -182,10 +185,22 @@ class Server:
         #         self.lavaData.append(lava.to_json())
             
         #         print("HH")
+            
+
+        block = self.BiglavaBlock.to_json()
+        flag = self.flag.to_json()
+
+        # if self.lavaBlocks:
+        #     for lava in self.lavaBlocks:
+        #         # self.lavaData.append((lava.x,lava.y).to_json())
+        #         self.lavaData.append(lava.to_json())
+            
+        #         print("HH")
 
         gameState = {
             # 'Players': self.players,
             'Players': [player.to_json() for player in self.players], # Serialize players
+            
             
 
             'Rope': self.rope_data,
@@ -230,6 +245,7 @@ class Server:
         data = json.loads(json_data)  # Deserialize JSON string into Python data
 
         #print("SERVER: received data (state)", data)
+        #print("SERVER: received data (state)", data)
 
         return data
 
@@ -238,6 +254,7 @@ class Server:
         self.pressed_keys[client_id] = pressed_keys  # Update which keys this client is pressing
         print(self.pressed_keys)
 
+        #print("SERVER: Received keys:", pressed_keys, "for player", player.id)  # Enhanced logging
         #print("SERVER: Received keys:", pressed_keys, "for player", player.id)  # Enhanced logging
         
         if player:
@@ -280,6 +297,17 @@ class Server:
             if self.rope:
                 self.rope.update()
 
+            if not self.lavaColl:
+                for lava in self.lavaBlocks:
+                    lava.update()
+                self.BiglavaBlock.update()
+
+
+            if player.collision:
+                player.action = 'died'
+                self.lavaColl = True
+
+            
             if not self.lavaColl:
                 for lava in self.lavaBlocks:
                     lava.update()
@@ -376,6 +404,6 @@ class Server:
 
 # if __name__ == '__main__':
 # #     print("This is correct server file")
-# def create_server(ip, port):
-#     server = Server(ip, port)
-#     server.start_server()
+#     def create_server(ip, port):
+#         server = Server(ip, port)
+#         server.start_server()

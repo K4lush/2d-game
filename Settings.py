@@ -7,39 +7,48 @@ from Music import MusicPlayer
 class Settings:
     def __init__(self):
         self.map = [
-            [1, -1, -1, -1, 1, 1, 1],
-            [1, 1, 1, -1, -1, -1, 1],
-            [1, -1, -1, 1, 1, -1, 1],
-            [1, 1, -1, -1, -1, -1,1],
-            [1, -1, 1, 1, -1, -1, 1],
-            [1, -1, -1, -1, 1, 1, 1],
-            [1, 1, -1, -1, -1, -1,1],  # START
-            [1, -1, 1, 1, -1, -1, 1],
-            [1, -1, -1, -1, 1, 1, 1],
-            [1, 1, 1, -1, -1, -1, 1]
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,1,1,0,0,0,0,0,0,0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         ]
 
         self.platforms = []
         self.player_sprites = {}
         self.lava_sprites = {}
         self.flagSpritesDict = {}
+        self.arrowSpritesDict = {}
         self.gameOver = False
         self.create_blocks_from_map()
         self.character_sprites = self.load_characters_sprites()
+        self.flagSprites = self.loadFlagSprites()
         self.flagSprites = self.loadFlagSprites()
         self.lavaAnimationFrames = self.load_lava_animations()
         self.lavaBlockSprite = self.loadLavaBlockSprite()
         self.background_image = None  # Add this line to initialize the background image attribute
         self.load_background_image()  # Call the method to load the background image
+        self.arrowFrames = self.loadArrrowSprites()
+
         self.music_enabled = True  # Default value
         self.music_volume = 0.5  # Default volume (0.0 to 1.0)
         self.music_file_path = 'Game_music.mp3'  # Default music file path
-        self.music_player = None  # Placeholder for a MusicPlayer instance
-
+        self.music_player = None 
 
     def loadLavaBlockSprite(self):
         lavaSheet = pygame.image.load('assets/Terrain/lavaAnimation.png').convert_alpha()
         frame1 = lavaSheet.subsurface((0, 221, 16, 16))
+        frame1_scaled = pygame.transform.scale(frame1, (2000, 2000))
         frame1_scaled = pygame.transform.scale(frame1, (2000, 2000))
         return frame1_scaled
     
@@ -50,6 +59,23 @@ class Settings:
             'ungotten':self.load_flag_animation_frames('ungotten', 1),
         }
         return sprites
+
+    def loadArrrowSprites(self):
+        arrow_sheet = pygame.image.load('assets/Traps/Arrow/Idle.png').convert_alpha()
+      
+        num_frames = 10
+        frame_width = arrow_sheet.get_width() // num_frames
+        frame_height = arrow_sheet.get_height()
+        #frame_offsets = [i * (frame_width + 1) for i in range(num_frames)]
+
+        arrow_frames = []
+        for i in range(num_frames):
+            frame = arrow_sheet.subsurface((i * frame_width, 0, frame_width, frame_height))
+            # scaled_frame = pygame.transform.scale(frame,
+            #                                       (frame_width, frame_height))  # Scale frame by a factor of 3
+            arrow_frames.append(frame)
+
+        return arrow_frames
 
 
 
@@ -64,7 +90,9 @@ class Settings:
         for offset in frame_offsets:
             frame = lava_sheet.subsurface((offset, 0, frame_width, frame_height))
             scaled_frame = pygame.transform.scale(frame,
-                                                  (frame_width * 10, frame_height * 10))  # Scale frame by a factor of 3
+                                                  (frame_width * 10, frame_height * 10)  # Scale frame by a factor of 3
+                                                  (frame_width * 10, frame_height * 10)
+            )  # Scale frame by a factor of 3
             lava_frames.append(scaled_frame)
 
         return lava_frames
@@ -72,19 +100,33 @@ class Settings:
     def updateLavaSprites(self, lavaBlocks):
         # lava id as key animated sprite instance as value
         
+        
         for lava in lavaBlocks:
+            sprite_key = lava['lavaX']
+            
             sprite_key = lava['lavaX']
             
 
             if sprite_key not in self.lava_sprites:
                 frames = self.lavaAnimationFrames
                 self.lava_sprites[sprite_key] = AnimatedSprite(frames, frame_rate=50,) #lava=lava )
+                self.lava_sprites[sprite_key] = AnimatedSprite(frames, frame_rate=50,) #lava=lava )
             sprite = self.lava_sprites[sprite_key]
 
             sprite.update()
 
+    def updateArrowSprites(self, arrows):
+        for arrow in arrows:
+            sprite_key = arrow['id']
+            if sprite_key not in self.arrowSpritesDict:
+                frames = self.arrowFrames
+                self.arrowSpritesDict[sprite_key] = AnimatedSprite(frames, frame_rate=50,)
+            sprite = self.arrowSpritesDict[sprite_key]
+            sprite.update()
+
     def updateLavaBlock(self, lavaBlock):
 
+        spriteKey = lavaBlock['lavaX'] - 999
         spriteKey = lavaBlock['lavaX'] - 999
         if spriteKey not in self.lava_sprites:
             frames = []
@@ -98,11 +140,13 @@ class Settings:
                 'idle': self.load_animation_frames('NinjaFrog', 'idle', 11),
                 'run': self.load_animation_frames('NinjaFrog', 'run', 12),
                 'died': self.load_animation_frames('NinjaFrog', 'died', 7),
+                'died': self.load_animation_frames('NinjaFrog', 'died', 7),
                 # Add more animations for NinjaFrog as needed
             },
             'MaskDude': {
                 'idle': self.load_animation_frames('MaskDude', 'idle', 11),
                 'run': self.load_animation_frames('MaskDude', 'run', 12),
+                'died': self.load_animation_frames('MaskDude', 'died', 7),
                 'died': self.load_animation_frames('MaskDude', 'died', 7),
                 # Add more animations for MaskDude as needed
             },
@@ -110,11 +154,13 @@ class Settings:
                 'idle': self.load_animation_frames('PinkMan', 'idle', 11),
                 'run': self.load_animation_frames('PinkMan', 'run', 12),
                 'died': self.load_animation_frames('PinkMan', 'died', 7),
+                'died': self.load_animation_frames('PinkMan', 'died', 7),
                 # Add more animations for NinjaFrog as needed
             },
             'VirtualGuy': {
                 'idle': self.load_animation_frames('VirtualGuy', 'idle', 11),
                 'run': self.load_animation_frames('VirtualGuy', 'run', 12),
+                'died': self.load_animation_frames('VirtualGuy', 'died', 7),
                 'died': self.load_animation_frames('VirtualGuy', 'died', 7),
                 # Add more animations for MaskDude as needed
             }
@@ -149,13 +195,28 @@ class Settings:
             frames.append(scaled_frame)
 
         return frames
+    
+    def load_flag_animation_frames(self, action, num_frames, target_width=50, target_height=50):
+        path = f'assets/Items/Checkpoints/Checkpoint/{action}.png'
+        sprite_sheet = pygame.image.load(path).convert_alpha()
+        frame_width = sprite_sheet.get_width() // num_frames
+        frame_height = sprite_sheet.get_height()
+
+        frames = []
+        for i in range(num_frames):
+            frame = sprite_sheet.subsurface((i * frame_width, 0, frame_width, frame_height))
+            scaled_frame = pygame.transform.scale(frame, (target_width, target_height))  # Scale frame to target size
+            frames.append(scaled_frame)
+
+        return frames
 
     def update_player_sprite(self, players):
 
-        print("SETTINGS: update_player_sprite", players)
+        #print("SETTINGS: update_player_sprite", players)
 
         for player in players:
 
+            #print("SETTINGS: update_player_sprite (player)", player)
             #print("SETTINGS: update_player_sprite (player)", player)
 
             id = player['id']
@@ -163,6 +224,7 @@ class Settings:
             action = player['action']
             direction = player['direction']
 
+            #print("SETTING: ", id, character, action, direction)
             #print("SETTING: ", id, character, action, direction)
 
             sprite_key = f'{id}_{character}_{action}'
@@ -175,6 +237,8 @@ class Settings:
                         self.player_sprites[sprite_key].frame_rate = 200
                         
                         
+                        
+                        
 
                     if direction == 'left':
                         self.player_sprites[sprite_key].set_flipped(True)
@@ -182,6 +246,12 @@ class Settings:
             sprite = self.player_sprites[sprite_key]
 
             # # Adjust sprite frame rate for 'died' state only if needed
+            if action == 'died' and not sprite.died_state_started:
+                sprite.frame_rate = 200
+                sprite.died_state_started = True
+            elif action != 'died' and sprite.died_state_started:
+                sprite.frame_rate = 50
+                sprite.died_state_started = False
             if action == 'died' and not sprite.died_state_started:
                 sprite.frame_rate = 200
                 sprite.died_state_started = True
@@ -213,7 +283,10 @@ class Settings:
             frames = self.flagSprites[action]
             self.flagSpritesDict[spriteKey] = AnimatedSprite(frames, frame_rate=50)
         sprite = self.flagSpritesDict[spriteKey]
-        sprite.update()
+        if sprite.flagDone is True:
+            action = 'idle'
+        sprite.update(action)
+        
 
 
 
@@ -221,7 +294,7 @@ class Settings:
 
     def create_blocks_from_map(self):
         """Creates block objects based on the map data."""
-        tile_size = 68  # Size of each tile
+        tile_size = 34  # Size of each tile    64
         # Assuming self.settings.map is a 2D list indicating the type of tile at each position
         for row_index, row in enumerate(self.map):
             for col_index, tile_type in enumerate(row):

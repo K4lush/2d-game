@@ -3,28 +3,80 @@ import time
 
 class Player:
     def __init__(self, id, character, action, direction, x, y, width, height, colour, speed=5, collision=False):
+    def __init__(self, id, character, action, direction, x, y, width, height, colour, speed=5, collision=False):
         self.id = id
         self.character = character
         self.action = action
         self.direction = direction
         self.x = x
         self.y = y
+        
         self.width = width
         self.height = height
         self.colour = colour
         self.speed = speed
+        self.collision = collision
         self.collision = collision
         self.rect = pygame.Rect(x, y, width, height)
         self.is_jumping = False
         self.on_ground = False  # Initialize the on_ground flag
         self.jump_velocity = 0  # Initialize jump velocity
         self.gravity = 0.9  # Adjust this for desired gravity strength
+        self.flagCollision = False
 
         self.last_jump_time = 0  # Timestamp of last jump
         self.jump_cooldown = 0.4  # Cooldown in seconds
 
+        self.score = 0
+        self.oldY = 0
+
         print("Player Width:", self.rect.width)
-        print("Player Height:", self.rect.height)       
+        print("Player Height:", self.rect.height)    
+
+    def check_collision(self, sprite_mask, rect):
+        block_mask = pygame.mask.from_surface(pygame.Surface((rect.width, rect.height)))
+        print(type(block_mask))
+
+    # Offset the rectangle mask to match the position of the rectangle
+        offset = (rect.left, rect.top)
+        
+        # Check for overlap
+        overlap = sprite_mask.overlap(block_mask, offset)
+        
+        return overlap is not None
+
+    # def updateScore(self):
+    #     y_scaling_factor = 0.1  # Adjust this value as desired
+
+    #     # Calculate the score increase based on Y position
+    #     score_increase = int((self.rect.y - 10000) * y_scaling_factor)
+
+    #     # Ensure the score doesn't go negative
+    #     if score_increase > 0:
+    #         self.score += score_increase
+    def updateScore(self):
+        y_scaling_factor = 0.1  # Adjust this value as desired
+
+        # Calculate the change in y position
+        y_change = self.rect.y - self.previous_y
+
+        # Only update score if y position has increased
+        if y_change > 0:
+            # Check if the current y position is greater than the previous y position
+            if self.rect.y > self.previous_y:
+                # Calculate score increase based on the positive change in y position
+                score_increase = int(y_change * y_scaling_factor)
+
+                # Update the score
+                self.score += score_increase
+
+        # Update the previous y position for the next iteration
+        self.previous_y = self.rect.y
+        
+
+    def setAction(self, action):
+            self.current_action = action
+            self.current_frame = 0   
 
     # In your Player class
     def apply_gravity(self):
@@ -45,6 +97,7 @@ class Player:
             'rect_centerx': self.rect.centerx,  # Add rect.centerx
             'rect_centery': self.rect.centery,  # Add rect.centery
             'collision':self.collision,
+            'score':self.score
             # ... other necessary attributes ...
         }
 
@@ -54,7 +107,7 @@ class Player:
         """Starts a jump if the player is standing on the ground."""
         print("PLAYER: Should be jumping")
         if self.on_ground and current_time - self.last_jump_time > self.jump_cooldown:
-            self.jump_velocity = -13  # Negative velocity means upwards jump
+            self.jump_velocity = -15  # Negative velocity means upwards jump
             self.is_jumping = True
             self.on_ground = False
             self.last_jump_time = current_time  # Update last jump time
@@ -84,6 +137,13 @@ class Player:
                     self.x = platform.left - self.width
 
             self.update_rect()
+
+    def hanldeFlagCollision(self, flags):
+        if self.rect.colliderect(flags.rect):
+            flags.action = 'gotten'
+            self.flagCollision = True
+            
+
 
     def get_collision_side(self, platform):
         # Calculate the sides of the player and the platform

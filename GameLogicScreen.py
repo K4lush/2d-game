@@ -21,6 +21,11 @@ class GameLogicScreen:
         self.screen_height = 600
         self.font_size = 30
         self.alpha_value = 0
+        self.gameOver = False
+        self.screen_width = 800
+        self.screen_height = 600
+        self.font_size = 30
+        self.alpha_value = 0
 
         ### ROPE VALUES TO BE MOVED ###
         self.player1 = None
@@ -31,6 +36,7 @@ class GameLogicScreen:
         self.rope_color = None
         self.lavaData = None
         self.flag = None
+        self.Arrows = None
 
 
     def fade_in_game_over(self, screen):
@@ -64,13 +70,21 @@ class GameLogicScreen:
 
         # Send pressed keys if any, else send 'idle'
 
-        return pressed_keys if pressed_keys else ['idle']
+        #return pressed_keys if pressed_keys else ['idle']
+    #     if (self.players[0] is not None and self.players[0].action == 'died') or (self.players[1] is not None and self.players[1].action == 'died'):
+    # # Your code here
 
+    #         return ['died']
+    #     else:
+        return pressed_keys if pressed_keys else ['idle'] 
+        
     def update(self, data):
         print("GameLogicClass: Data Received:", data)  # Enhanced logging
         if self.settings.gameOver is True:
             print("gameOver in gameLogicScreen")
             self.gameOver = True
+       
+        
         if 'Players' in data and data['Players'] is not None:
             self.players = data['Players']
 
@@ -92,10 +106,13 @@ class GameLogicScreen:
 
         if 'Lava' in data:
             self.lavaData = data['Lava']
+            self.lavaData = data['Lava']
         if 'LavaBlock' in data:
             self.BigLavaBlock  = data['LavaBlock']
         if 'Flag' in data:
             self.flag = data['Flag']
+        if 'Arrow' in data:
+            self.Arrows = data['Arrow']
            
             
 
@@ -108,6 +125,7 @@ class GameLogicScreen:
         self.settings.updateLavaSprites(self.lavaData)
         self.settings.updateLavaBlock(self.BigLavaBlock)
         self.settings.updateFlagSprites(self.flag)
+        self.settings.updateArrowSprites(self.Arrows)
 
 
 
@@ -138,57 +156,35 @@ class GameLogicScreen:
         if self.settings.background_image:
             screen.blit(self.settings.background_image, (0, 0))
 
+        
+
         for block in self.settings.platforms:
             if block.sprite:  # Ensure a sprite is assigned
                 block.draw(screen, (block.x - camera_offset_x, block.y - camera_offset_y))
 
-
+        # if not self.gameOver:
         if self.players:
-            for player in self.players:
-                id = player['id']
-                character = player['character']
-                action = player['action']
-                direction = player['direction']
-                sprite_key = f'{id}_{character}_{action}'
-                if sprite_key in self.settings.player_sprites:  # Make sure the sprite exists
-                    sprite = self.settings.player_sprites[sprite_key]
-                    sprite.draw(screen, (player['x'] - camera_offset_x, player['y'] - camera_offset_y))
+                for player in self.players:
+                    id = player['id']
+                    character = player['character']
+                    action = player['action']
+                    direction = player['direction']
+                    sprite_key = f'{id}_{character}_{action}'
+                    if sprite_key in self.settings.player_sprites:  # Make sure the sprite exists
+                        sprite = self.settings.player_sprites[sprite_key]
+                        sprite.draw(screen, (player['x'] - camera_offset_x, player['y'] - camera_offset_y))
+                # if len(self.players) ==2:
+                #     player1score = self.players[0]['score']
+                #     player2score = self.players[1]['score']
 
-        if self.rope:
-            # Calculate updated positions with camera offset
-            updated_start_pos = (self.start_pos[0] - camera_offset_x, self.start_pos[1] - camera_offset_y)
-            updated_end_pos = (self.end_pos[0] - camera_offset_x, self.end_pos[1] - camera_offset_y)
+                #     score = max(player1score,player2score)
+                #     print("This is score value: ", score)
+                #     my_font = pygame.font.SysFont('Comic Sans MS', 30)
+                #     text_surface = my_font.render(str(score), True, (255, 255, 255))  # Convert score to a string
+                #     screen.blit(text_surface, (20 , 20))  # Use a tuple for coordinates
 
-            # Calculate distance
-            distance = math.sqrt(
-                (updated_start_pos[0] - updated_end_pos[0]) ** 2 + (updated_start_pos[1] - updated_end_pos[1]) ** 2)
+                
 
-            # Dynamic color based on tension
-            max_length = 150  # Hardcoded max length value
-            color_intensity = 255 if distance >= max_length else min(255, max(0, 155 + int(distance / 2)))
-            rope_color = (color_intensity, color_intensity // 2, 0)
-
-            # Generate Bezier curve points
-            curve_points = []
-            if distance < max_length:
-                curve_intensity = max(0, min(50, 100 - (distance / max_length) * 100))
-                control_point1 = (updated_start_pos[0], updated_start_pos[1] + curve_intensity)
-                control_point2 = (updated_end_pos[0], updated_end_pos[1] + curve_intensity)
-                for t in range(0, 101, 5):
-                    t /= 100
-                    bx = (1 - t) ** 3 * updated_start_pos[0] + 3 * (1 - t) ** 2 * t * control_point1[0] + 3 * (
-                                1 - t) * t ** 2 * control_point2[0] + t ** 3 * updated_end_pos[0]
-                    by = (1 - t) ** 3 * updated_start_pos[1] + 3 * (1 - t) ** 2 * t * control_point1[1] + 3 * (
-                                1 - t) * t ** 2 * control_point2[1] + t ** 3 * updated_end_pos[1]
-                    curve_points.append((bx, by))
-
-            # Draw bezier curve or straight line
-            if distance >= max_length or len(curve_points) < 2:
-                pygame.draw.line(screen, rope_color, updated_start_pos, updated_end_pos, 5)
-            else:
-                pygame.draw.lines(screen, rope_color, False, curve_points, 5)
-            #pygame.display.flip()
-            
 
 
         if self.flag:
@@ -198,6 +194,14 @@ class GameLogicScreen:
             if key in self.settings.flagSpritesDict:
                 sprite = self.settings.flagSpritesDict[key]
                 sprite.draw(screen, (self.flag['x']- camera_offset_x, self.flag['y']- camera_offset_y))
+
+        if self.Arrows:
+            print("HERE")
+            for arrow in self.Arrows:
+                id = arrow['id']
+                if id in self.settings.arrowSpritesDict:
+                    sprite = self.settings.arrowSpritesDict[id]
+                    sprite.draw(screen, (arrow['arrowX'] - camera_offset_x, arrow['arrowY'] - camera_offset_y))
 
 
         if self.lavaData:
@@ -215,15 +219,47 @@ class GameLogicScreen:
                 sprite = self.settings.lava_sprites[key]
                 # sprite.draw(screen, (self.BigLavaBlock.x - camera_offset_x, self.BigLavaBlock.y - camera_offset_y))
                 sprite.draw(screen, (self.BigLavaBlock['lavaX'] - camera_offset_x, self.BigLavaBlock['lavaY'] - camera_offset_y))
+        if not self.gameOver:
+            if self.rope:
+                # Calculate updated positions with camera offset
+                updated_start_pos = (self.start_pos[0] - camera_offset_x, self.start_pos[1] - camera_offset_y)
+                updated_end_pos = (self.end_pos[0] - camera_offset_x, self.end_pos[1] - camera_offset_y)
 
+                # Calculate distance
+                distance = math.sqrt(
+                    (updated_start_pos[0] - updated_end_pos[0]) ** 2 + (updated_start_pos[1] - updated_end_pos[1]) ** 2)
+
+                # Dynamic color based on tension
+                max_length = 150  # Hardcoded max length value
+                color_intensity = 255 if distance >= max_length else min(255, max(0, 155 + int(distance / 2)))
+                rope_color = (color_intensity, color_intensity // 2, 0)
+
+                # Generate Bezier curve points
+                curve_points = []
+                if distance < max_length:
+                    curve_intensity = max(0, min(50, 100 - (distance / max_length) * 100))
+                    control_point1 = (updated_start_pos[0], updated_start_pos[1] + curve_intensity)
+                    control_point2 = (updated_end_pos[0], updated_end_pos[1] + curve_intensity)
+                    for t in range(0, 101, 5):
+                        t /= 100
+                        bx = (1 - t) ** 3 * updated_start_pos[0] + 3 * (1 - t) ** 2 * t * control_point1[0] + 3 * (
+                                    1 - t) * t ** 2 * control_point2[0] + t ** 3 * updated_end_pos[0]
+                        by = (1 - t) ** 3 * updated_start_pos[1] + 3 * (1 - t) ** 2 * t * control_point1[1] + 3 * (
+                                    1 - t) * t ** 2 * control_point2[1] + t ** 3 * updated_end_pos[1]
+                        curve_points.append((bx, by))
+
+                # Draw bezier curve or straight line
+                if distance >= max_length or len(curve_points) < 2:
+                    pygame.draw.line(screen, rope_color, updated_start_pos, updated_end_pos, 5)
+                else:
+                    pygame.draw.lines(screen, rope_color, False, curve_points, 5)
+
+                # Don't forget to update the display
+            pygame.display.flip()
         print("this is self.gameOver",self.gameOver)
         if self.gameOver is True:
             print("calling method")
             self.fade_in_game_over(screen)
-
-
-
-
 
 
 

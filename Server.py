@@ -16,6 +16,7 @@ from Settings import Settings
 from MapServer import MapServer
 from Lava import Lava
 from Flag import Flag
+from Arrow import Arrows
 
 from Rope import Rope
 
@@ -33,7 +34,7 @@ class ClientHandler:
         ClientHandler.client_count += 1
 
     def add_player(self, id, character_name):
-        player = Player(id, character_name, 'idle', 'right', (200 if id == 0 else 100), 350, 50, 50,
+        player = Player(id, character_name, 'idle', 'right', (200 if id == 0 else 300), 350, 50, 50,
                         (255, 0, 255 if id == 0 else 255, 200, 255))
         self.server.players.append(player)
 
@@ -104,7 +105,7 @@ class Server:
         self.client_handlers = []
         self.players_ready_state = [None, None]
         self.pressed_keys = {}  # In your server class
-
+        self.Arrows = []
         ### Move to setting class ###
         self.platforms_sent = False
         self.rope_created = False
@@ -113,13 +114,18 @@ class Server:
         self.players = []
         self.lavaBlocks = []
         self.lavaData = []
+        self.lavaData = []
         self.BiglavaBlock = None
+        self.lavaColl = False
+        self.flag = None
         self.lavaColl = False
         self.flag = None
         self.CreateLava()
         self.platforms = self.create_platform_rects()  # Create platform rects
         self.CreateBigLavaBlock()
         self.createFlag()
+        self.playerSprites = self.load_characters_sprites()
+        self.createArrows()
 
         # self.start_server()
 
@@ -137,6 +143,13 @@ class Server:
             # Game logic updates:
             # self.update_game_state()
 
+    def createArrows(self):
+        Arrow1 = Arrows(1,250,380,40,40)
+        Arrow2 = Arrows(2,550,380,40,40)
+        self.Arrows.append(Arrow1)
+        self.Arrows.append(Arrow2)
+
+
 
     # def new_broadcast(self):
     #     # Send to ready clients
@@ -145,7 +158,7 @@ class Server:
     #             print(f"SERVER: Broadcasting client {client_handler.id}")
     #             self.broadcast_to_client(client_handler.client)
     def createFlag(self):
-        self.flag = Flag('flag', 300 , 300, 50, 50, 'gotten')
+        self.flag = Flag('flag', 300 , 500, 50, 50, 'ungotten')
 
     def add_client_handler(self, client_handler):
         with self.lock:
@@ -172,10 +185,22 @@ class Server:
         #         self.lavaData.append(lava.to_json())
             
         #         print("HH")
+            
+
+        block = self.BiglavaBlock.to_json()
+        flag = self.flag.to_json()
+
+        # if self.lavaBlocks:
+        #     for lava in self.lavaBlocks:
+        #         # self.lavaData.append((lava.x,lava.y).to_json())
+        #         self.lavaData.append(lava.to_json())
+            
+        #         print("HH")
 
         gameState = {
             # 'Players': self.players,
             'Players': [player.to_json() for player in self.players], # Serialize players
+            
             
 
             'Rope': self.rope_data,
@@ -184,33 +209,25 @@ class Server:
 
             'LavaBlock':block,
 
-            'Flag':flag
+            'Flag':flag,
+
+            'Arrow': [arrow.to_json() for arrow in self.Arrows]
 
 
-            # 'Lava': self.lavaBlocks,
-            # 'LavaBlock': self.BiglavaBlock
+            
         }
 
-        # data = pickle.dumps(gameState)
-        #
-        # print("SERVER: This is what the server is sending", gameState)
-        #
-        # client.sendall(data)
-
-        #print("SERVER: GameState being prepared:", gameState)
 
         data = json.dumps(gameState)
 
-        #print("SERVER: Sending data (once encoded):", data)
+       
 
         client.send(data.encode())
 
-    # def broadcast_state_to_client(self, client, data):
-    #     state = pickle.dumps(data)
-    #     client.sendall(state)
+   
 
     def receive_from_client_update(self, client):
-        # data = pickle.loads(obj.client.recv(4096))
+      
 
         buffer_size = 4096  # Adjust buffer size if needed
 
@@ -219,7 +236,6 @@ class Server:
         data = json.loads(json_data)  # Deserialize JSON string into Python data
 
 
-       # print("SERVER: This is what the server is receiving", data)
 
         self.update_objects(client.id, data)
 
@@ -228,6 +244,7 @@ class Server:
         json_data = client.client.recv(buffer_size).decode('utf-8')  # Receive as bytes, decode to string
         data = json.loads(json_data)  # Deserialize JSON string into Python data
 
+        #print("SERVER: received data (state)", data)
         #print("SERVER: received data (state)", data)
 
         return data
@@ -238,27 +255,32 @@ class Server:
         print(self.pressed_keys)
 
         #print("SERVER: Received keys:", pressed_keys, "for player", player.id)  # Enhanced logging
+        #print("SERVER: Received keys:", pressed_keys, "for player", player.id)  # Enhanced logging
         
         if player:
             if pressed_keys == ['idle']:
                 player.action = 'idle'
+            
+            if player.collision:
+                player.action = 'died'
 
             # 1. Apply Movement
-            if "left" in pressed_keys:
+            if "left" in pressed_keys and not player.collision:
                 player.move_left()
                 player.action = 'run'
                 player.direction = 'left'  # Add direction attribute
 
-            if "right" in pressed_keys:
+            if "right" in pressed_keys and not player.collision:
                 player.move_right()
                 player.action = 'run'
                 player.direction = 'right'  # Add direction attribute
 
             # print("PLAYER: Ground Flag ", player.on_ground)
 
-            if "up" in self.pressed_keys[client_id]:  # Check if 'up' is being held down
+            if "up" in self.pressed_keys[client_id] and not player.collision:  # Check if 'up' is being held down
                 player.jump()
                 player.action = 'run'
+            
 
             # 3. Apply Gravity (conditionally)
             if not player.on_ground:
@@ -266,11 +288,26 @@ class Server:
 
             # # 4. Handle Collisions
             player.handle_collisions(self.platforms)  # Assuming you have a list of platforms
+            #player.handlePixelPerfectCollisions(self.platforms, self.playerSprites)
             player.handleLavaCollisions(self.lavaBlocks)
+            player.hanldeFlagCollision(self.flag)
+            #player.updateScore()
+            print("thsi is player score from server: ",player.score)
             # 5. Update Rope (if it exists)
             if self.rope:
                 self.rope.update()
 
+            if not self.lavaColl:
+                for lava in self.lavaBlocks:
+                    lava.update()
+                self.BiglavaBlock.update()
+
+
+            if player.collision:
+                player.action = 'died'
+                self.lavaColl = True
+
+            
             if not self.lavaColl:
                 for lava in self.lavaBlocks:
                     lava.update()
@@ -308,8 +345,8 @@ class Server:
 
     def create_platform_rects(self):
         platforms = []
-        block_width = 68  # The width of each block
-        block_height = 68  # The height of each block
+        block_width = 34  # The width of each block
+        block_height = 34  # The height of each block
 
         for row_index, row in enumerate(self.settings.map):
             for col_index, cell in enumerate(row):
@@ -319,6 +356,50 @@ class Server:
                     platforms.append(block_rect)
 
         return platforms
+    
+    def load_characters_sprites(self):
+        characters = {
+            'NinjaFrog': {
+                'idle': self.load_animation_frames('NinjaFrog', 'idle', 11),
+                'run': self.load_animation_frames('NinjaFrog', 'run', 12),
+                'died': self.load_animation_frames('NinjaFrog', 'died', 7),
+                # Add more animations for NinjaFrog as needed
+            },
+            'MaskDude': {
+                'idle': self.load_animation_frames('MaskDude', 'idle', 11),
+                'run': self.load_animation_frames('MaskDude', 'run', 12),
+                'died': self.load_animation_frames('MaskDude', 'died', 7),
+                # Add more animations for MaskDude as needed
+            },
+            'PinkMan': {
+                'idle': self.load_animation_frames('PinkMan', 'idle', 11),
+                'run': self.load_animation_frames('PinkMan', 'run', 12),
+                'died': self.load_animation_frames('PinkMan', 'died', 7),
+                # Add more animations for NinjaFrog as needed
+            },
+            'VirtualGuy': {
+                'idle': self.load_animation_frames('VirtualGuy', 'idle', 11),
+                'run': self.load_animation_frames('VirtualGuy', 'run', 12),
+                'died': self.load_animation_frames('VirtualGuy', 'died', 7),
+                # Add more animations for MaskDude as needed
+            }
+            # Add more characters as needed
+        }
+        return characters
+
+    def load_animation_frames(self, character_folder, action, num_frames, target_width=50, target_height=50):
+        path = f'assets/MainCharacters/{character_folder}/{action}.png'
+        sprite_sheet = pygame.image.load(path).convert_alpha()
+        frame_width = sprite_sheet.get_width() // num_frames
+        frame_height = sprite_sheet.get_height()
+
+        frames = []
+        for i in range(num_frames):
+            frame = sprite_sheet.subsurface((i * frame_width, 0, frame_width, frame_height))
+            scaled_frame = pygame.transform.scale(frame, (target_width, target_height))  # Scale frame to target size
+            frames.append(scaled_frame)
+
+        return frames
 
 
 # if __name__ == '__main__':

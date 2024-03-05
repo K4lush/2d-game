@@ -150,8 +150,15 @@ class GameLogicScreen:
             # Calculate camera offset to center on midpoint
             camera_offset_x = mid_x - WINDOW_WIDTH / 2
             camera_offset_y = mid_y - WINDOW_HEIGHT / 2
+        elif self.players!= None:
+            #
+            mid_x = (players[0]['x'])
+            mid_y = (players[0]['y'])
+
+            camera_offset_x = mid_x - WINDOW_WIDTH / 2
+            camera_offset_y = mid_y - WINDOW_HEIGHT / 2
         else:
-            camera_offset_x, camera_offset_y = 0, 0
+            camera_offset_x, camera_offset_y = 0, 600
 
        
 

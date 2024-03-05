@@ -144,8 +144,8 @@ class Server:
             # self.update_game_state()
 
     def createArrows(self):
-        Arrow1 = Arrows(1,250,380,60,60)
-        Arrow2 = Arrows(2,550,380,60,60)
+        Arrow1 = Arrows(1,250,950,75,75)
+        Arrow2 = Arrows(2,550,950,75,75)
         self.Arrows.append(Arrow1)
         self.Arrows.append(Arrow2)
 
@@ -153,7 +153,7 @@ class Server:
 
   
     def createFlag(self):
-        self.flag = Flag('flag', 300 , 350, 50, 50, 'ungotten')
+        self.flag = Flag('flag', 300 , 350, 75, 75, 'ungotten')
 
     def add_client_handler(self, client_handler):
         with self.lock:

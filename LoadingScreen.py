@@ -10,7 +10,7 @@ class LoadingScreen:
 
     def update(self, network):
         other_player_state = network.receive()
-        print(other_player_state)
+        
         if other_player_state == "READY":
             return "PLAYING"
 

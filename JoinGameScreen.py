@@ -97,7 +97,7 @@ class JoinGameScreen:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.current_state == "MAIN":
                     if self.join_button.rect.collidepoint(pygame.mouse.get_pos()):
-                        print("Changing state to JOIN")
+                       
                         self.current_state = "JOIN"
                     if self.host_game.rect.collidepoint(pygame.mouse.get_pos()):
                         self.current_state = "HOST"
@@ -169,7 +169,7 @@ class JoinGameScreen:
             server_thread = Thread(target=start_server_thread)
             server_thread.start()
 
-            print("Server has been created")
+            
             self.create_server = False  # Reset the flag
 
         if self.switch_state:

@@ -76,7 +76,7 @@ class MainMenuScreen:
                 pygame.quit()
                 return
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                print("THIS IS EVENT", event)
+               
 
                 if self.start_button.rect.collidepoint(pygame.mouse.get_pos()):
                     self.switch_state = True
@@ -106,7 +106,7 @@ class MainMenuScreen:
 
 
     def update(self):
-        print("UPDATE: ", self.switch_state)
+       
 
         if self.switch_state:
             return "PLAYING"

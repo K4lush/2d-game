@@ -15,7 +15,7 @@ class Button:
         try:
             self.font = pygame.font.Font(font, font_size)
         except IOError:
-            print(f"Font file {font} not found. Falling back to default font.")
+          
             self.font = pygame.font.Font(None, font_size)
         self.function = function
         self.params = params

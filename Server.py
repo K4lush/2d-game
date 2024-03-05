@@ -43,13 +43,13 @@ class ClientHandler:
 
     def game(self):
         try:
-            print("ENTERING FOR CLIENT TO BE READY")
+            
             self.wait_until_ready()
 
             # print("WAITING FOR BOTH  CLIENTS TO BE READY")
             # self.wait_until_all_ready()
 
-            print("ENTERING GAME LOOP")
+           
             self.game_loop()
         except Exception as e:
             print(f"Exception in client handler: {e}")
@@ -113,14 +113,14 @@ class Server:
         self.rope_data = None
         self.players = []
         self.lavaBlocks = []
-        self.lavaData = []
+        
         self.lavaData = []
         self.BiglavaBlock = None
         self.lavaColl = False
-        self.flag = None
         self.lavaColl = False
         self.flag = None
         self.CreateLava()
+        self.nonBlockingPlatforms = []
         self.platforms = self.create_platform_rects()  # Create platform rects
         self.CreateBigLavaBlock()
         self.createFlag()
@@ -132,7 +132,7 @@ class Server:
     def start_server(self):
         self.server.bind((self.host, self.port))
         self.server.listen()
-        print(f"Server started, listening on IP: {self.host}")
+     
 
         while True:  # Main combined loop
             client, addr = self.server.accept()
@@ -151,12 +151,7 @@ class Server:
 
 
 
-    # def new_broadcast(self):
-    #     # Send to ready clients
-    #     for client_handler in self.client_handlers:
-    #         if client_handler.ready:
-    #             print(f"SERVER: Broadcasting client {client_handler.id}")
-    #             self.broadcast_to_client(client_handler.client)
+  
     def createFlag(self):
         self.flag = Flag('flag', 300 , 350, 50, 50, 'ungotten')
 
@@ -168,13 +163,13 @@ class Server:
         with self.lock:
             if client_handler in self.client_handlers:
                 self.client_handlers.remove(client_handler)
-                print(f"Client {client_handler.address} disconnected")
+                
 
     def broadcast_to_client(self, client):
 
         if self.rope:
             self.rope_data = self.rope.to_json()
-            print("H")
+          
 
         block = self.BiglavaBlock.to_json()
         flag = self.flag.to_json()
@@ -241,7 +236,7 @@ class Server:
     def update_objects(self, client_id, pressed_keys):
         player = self.find_player_by_id(client_id)
         self.pressed_keys[client_id] = pressed_keys  # Update which keys this client is pressing
-        print(self.pressed_keys)
+       
 
         #print("SERVER: Received keys:", pressed_keys, "for player", player.id)  # Enhanced logging
         #print("SERVER: Received keys:", pressed_keys, "for player", player.id)  # Enhanced logging
@@ -308,6 +303,8 @@ class Server:
                 self.lavaColl = True
 
             
+
+            
             
 
     def find_player_by_id(self, client_id):
@@ -343,6 +340,10 @@ class Server:
                     block_rect = pygame.Rect(col_index * block_width, row_index * block_height, block_width,
                                              block_height)
                     platforms.append(block_rect)
+                if cell == 3:
+                    block_rect = pygame.Rect(col_index * block_width, row_index * block_height, block_width,
+                                             block_height)
+                    self.nonBlockingPlatforms.append(block_rect)
 
         return platforms
     
@@ -389,10 +390,7 @@ class Server:
             frames.append(scaled_frame)
 
         return frames
+    
 
 
-# if __name__ == '__main__':
-# #     print("This is correct server file")
-#     def create_server(ip, port):
-#         server = Server(ip, port)
-#         server.start_server()
+

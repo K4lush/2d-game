@@ -26,20 +26,20 @@ class AnimatedSprite:
         if now - self.last_update > self.frame_rate:
             self.last_update = now
             self.current_frame = (self.current_frame + 1) % len(self.images)
-            print("this is action: ",action)
+            
             if action == 'died':
-                    print("Action is died in sprite class")
+                   
                     if self.died_state_started and not self.completed_once:
                         self.animation_completed = True
                         self.completed_once = True
-                        print("game over in animated sprite class", self.completed_once)
+                       
             if action == 'gotten':
                 if self.current_frame == len(self.images):
                     self.flagDone = True
 
    
     def draw(self, surface, position, offset_x=0, offset_y=0):
-        print(offset_y, offset_x)
+        
        
         offset_position = (position[0] - offset_x, position[1] - offset_y)
         # Draw the current frame of the animation on the given surface.

@@ -17,8 +17,7 @@ class Camera:
 
     def update(self, target):
         # debugging
-        print(f"Game world size: {self.width}, {self.height}")
-        print(f"Screen size: {self.screen_width}, {self.screen_height}")
+    
 
         # Center the camera on the target
         x = -target.rect.x + int(self.screen_width / 2)
@@ -37,7 +36,7 @@ class Camera:
         self.camera = pygame.Rect(x, y, self.width, self.height)
 
         # Printing out final camera position
-        print(f"New camera position: {self.camera.topleft}")
+       
 
     def apply_rect(self, rect):
         # This method shifts a rectangle by the camera offset.

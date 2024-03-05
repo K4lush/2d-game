@@ -22,7 +22,7 @@ class ClientHandler:
 
 
     def handle(self):
-        print("CONNECTED")
+       
         while self.connected:
             try:
                 self.server.broadcast()

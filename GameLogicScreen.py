@@ -3,6 +3,7 @@ import pickle
 from Lava import Lava
 from Rope import Rope
 from Settings import Settings
+from Button import Button
 
 import math
 
@@ -37,23 +38,38 @@ class GameLogicScreen:
         self.lavaData = None
         self.flag = None
         self.Arrows = None
-
+        self.score = 0
+        self.resetGame = False
 
     def fade_in_game_over(self, screen):
-            print("method called")
+           
             font = pygame.font.Font(None, self.font_size)
+
             text = font.render("GAME OVER", True, (255, 255, 255))
             text_width, text_height = font.size("GAME OVER")
+
+            score_text = font.render("Score: " + str(self.score), True, (255, 255, 255))
+            score_text_width, score_text_height = font.size("Score: " + str(self.score))
+
+
             if text_width < self.screen_width and text_height < self.screen_height:
                 self.font_size += 5  # Increase the font size
             self.alpha_value += 5  # Increase the alpha value
             if self.alpha_value > 255:
                 self.alpha_value = 255  # Ensure alpha doesn't exceed 255
             text.set_alpha(self.alpha_value)
+            score_text.set_alpha(self.alpha_value)
             screen.blit(text, ((self.screen_width - text_width) // 2, (self.screen_height - text_height) // 2))  # Center the text
+            screen.blit(score_text, ((self.screen_width - score_text_width) // 2, (self.screen_height - text_height) // 2 + text_height + 10))
+            
 
+
+            
 
     def handle_event(self, keys):
+
+     
+
         pressed_keys = []
 
         if keys[pygame.K_LEFT]:
@@ -72,9 +88,9 @@ class GameLogicScreen:
         return pressed_keys if pressed_keys else ['idle'] 
         
     def update(self, data):
-        print("GameLogicClass: Data Received:", data)  # Enhanced logging
+       
         if self.settings.gameOver is True:
-            print("gameOver in gameLogicScreen")
+          
             self.gameOver = True
        
         
@@ -95,7 +111,7 @@ class GameLogicScreen:
 
             # Calculate distance
             self.distance = math.sqrt((self.start_pos[0] - self.end_pos[0]) ** 2 + (self.start_pos[1] - self.end_pos[1]) ** 2)
-            print("Rope Start:", self.start_pos, "End:", self.end_pos, "Color:", self.rope_color)
+          
 
         if 'Lava' in data:
             self.lavaData = data['Lava']
@@ -142,15 +158,39 @@ class GameLogicScreen:
         return camera_offset_x, camera_offset_y
 
     def render(self, screen):
+
+     
+
+
         camera_offset_x, camera_offset_y = self.calculate_camera_offset(self.players)
         if self.settings.background_image:
-            screen.blit(self.settings.background_image, (0, 0))
+            block_height = 32
+            block_width = 32
+          
+            num_blocks_horizontal = self.screen_width // block_width + 1
+            num_blocks_vertical = self.screen_height // block_height + 1
+
+            
+
+            # Draw the background blocks
+            for row in range(num_blocks_vertical):
+                for col in range(num_blocks_horizontal):
+                    block_x = col * block_width - camera_offset_x
+                    block_y = row * block_height - camera_offset_y
+                    if block_x < self.screen_width and block_y < self.screen_height:  # Draw only within the screen boundaries
+                        block_rect = pygame.Rect(block_x, block_y, block_width, block_height)
+                        screen.blit(self.settings.background_image, block_rect)
 
         
 
         for block in self.settings.platforms:
             if block.sprite:  # Ensure a sprite is assigned
                 block.draw(screen, (block.x - camera_offset_x, block.y - camera_offset_y))
+
+        for block in self.settings.nonBlockingPlatforms:
+            if block.sprite:  # Ensure a sprite is assigned
+                block.draw(screen, (block.x - camera_offset_x, block.y - camera_offset_y))
+
 
         # if not self.gameOver:
         if self.players:
@@ -164,14 +204,14 @@ class GameLogicScreen:
                         sprite = self.settings.player_sprites[sprite_key]
                         sprite.draw(screen, (player['x'] - camera_offset_x, player['y'] - camera_offset_y))
                 if len(self.players) ==2:
-                    print("HERE BOZO")
+                   
                     player1score = self.players[0]['score']
                     player2score = self.players[1]['score']
 
-                    score = max(player1score,player2score)
-                    print("This is score value: ", score)
+                    self.score = max(player1score,player2score)
+                    
                     my_font = pygame.font.SysFont('Comic Sans MS', 30)
-                    text_surface = my_font.render(str(score), True, (255, 255, 255))  # Convert score to a string
+                    text_surface = my_font.render(str(self.score), True, (255, 255, 255))  # Convert score to a string
                     screen.blit(text_surface, (20 , 20))  # Use a tuple for coordinates
 
                 
@@ -187,7 +227,7 @@ class GameLogicScreen:
                 sprite.draw(screen, (self.flag['x']- camera_offset_x, self.flag['y']- camera_offset_y))
 
         if self.Arrows:
-            print("HERE")
+   
             for arrow in self.Arrows:
                 id = arrow['id']
                 if id in self.settings.arrowSpritesDict:
@@ -202,6 +242,9 @@ class GameLogicScreen:
                     sprite = self.settings.lava_sprites[sprite_key]
                     sprite.draw(screen, (lava['lavaX'] - camera_offset_x, lava['lavaY'] - camera_offset_y))
                     # sprite.draw(screen, (lava.x - camera_offset_x, lava.y - camera_offset_y))
+
+        
+
 
 
         if self.BigLavaBlock is not None:
@@ -247,9 +290,9 @@ class GameLogicScreen:
 
                 # Don't forget to update the display
             pygame.display.flip()
-        print("this is self.gameOver",self.gameOver)
+        
         if self.gameOver is True:
-            print("calling method")
+            
             self.fade_in_game_over(screen)
 
 

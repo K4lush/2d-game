@@ -10,6 +10,7 @@ from LoadingScreen import LoadingScreen
 from GameLogicScreen import GameLogicScreen
 
 
+
 class Client:
     SCREEN = pygame.display.set_mode((800, 400))
     BG_COLOR = (207, 185, 151)  # Background color
@@ -27,9 +28,9 @@ class Client:
         self.current_state = 'JOIN MENU'
 
     def run(self):
-        print("Game loop started")
+       
         while True:
-            print(f"Current state: {self.current_state}")  # Check current state at each iteration
+           
             self.update()
             self.render()
             self.handle_events()
@@ -40,7 +41,7 @@ class Client:
         if self.current_state == "PLAYING":
             incoming_game_state = self.receiveFromServer()
 
-            #print("CLIENT: This is what the Client is receiving", incoming_game_state)
+            
 
             self.game_logic.update(incoming_game_state)
 
@@ -60,10 +61,7 @@ class Client:
                 self.sendToServer(data)
                 self.current_state = 'PLAYING'
 
-        # elif self.current_state == "LOADING SCREEN":
-        #     new_state = self.loading_screen.update(self.network)
-        #     if new_state == 'PLAYING':
-        #         self.current_state = 'PLAYING'
+     
 
         elif self.current_state == "GAME OVER":
             pass
@@ -74,7 +72,7 @@ class Client:
         # Handle events outside of the loop, affecting global behavior as needed
         for event in events:
             if event.type == pygame.QUIT:
-                print("Quit event received")
+              
                 pygame.quit()
                 exit()
 
@@ -88,30 +86,32 @@ class Client:
         elif self.current_state == "LOADING SCREEN":
             pass  # You might have logic to update the loading screen here
 
+        
+
         elif self.current_state == "PLAYING":
             keys = pygame.key.get_pressed()
+        
+        
 
 
             outgoing_game_state = self.game_logic.handle_event(keys)
 
-            #print("TYPE OF GAME STATE ELEMENTS:", [type(x) for x in outgoing_game_state])
-
-            #print("THIS IS WHAT THE CLIENT IS SENDING", outgoing_game_state)
+           
             self.sendToServer(outgoing_game_state)
 
 
     def render(self):
-        print("Rendering...")
+       
         self.screen.fill(self.BG_COLOR)  # Use the background color variable
 
         if self.current_state == "PLAYING":
-            print("Rendering PLAYING state")
+            
             self.game_logic.render(self.screen)
         elif self.current_state == "JOIN MENU":
-            print("Rendering JOIN MENU state")
+            
             self.join_menu.render(self.screen)
         elif self.current_state == "MAIN MENU":
-            print("Rendering MAIN MENU state")
+            
             self.main_menu.render(self.screen)
         # Continue for other states as necessary
 
@@ -121,9 +121,7 @@ class Client:
 
     def sendToServer(self, data):
         try:
-            # json_data = json.dumps(data)
-            #
-            # print("CLIENT: This is sendToServer Method", data, json_data)
+           
 
             self.network.send(data)  # Remember to use sendall for UDP
         except Exception as e:
@@ -138,25 +136,6 @@ class Client:
             except json.JSONDecodeError as e:
                 print(f"Error decoding JSON data: {e}")
         return []  # Return an empty list if there's an issue
-
-
-
-    # def sendToServer(self, data):
-    #     try:
-    #         self.network.send(data)
-    #     except Exception as e:
-    #         print(f"Error sending data to server: {e}")
-
-    # def receiveFromServer(self):
-    #     incomingData = self.network.receive()
-    #     if incomingData:
-    #         try:
-    #             incomingData = pickle.loads(incomingData)
-    #             return incomingData
-    #         except pickle.UnpicklingError as e:
-    #             print(f"Error unpickling data: {e}")
-    #     return []
-
 
 if __name__ == "__main__":
     client = Client()

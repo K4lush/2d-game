@@ -37,7 +37,7 @@ class Player:
 
     def check_collision(self, sprite_mask, rect):
         block_mask = pygame.mask.from_surface(pygame.Surface((rect.width, rect.height)))
-        print(type(block_mask))
+       
 
     # Offset the rectangle mask to match the position of the rectangle
         offset = (rect.left, rect.top)

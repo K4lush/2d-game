@@ -137,45 +137,51 @@ class JoinGameScreen:
             self.ip_input_Server.update(event)
             self.port_input_Server.update(event)
 
-
-
     def update(self):
-        # print(self.current_state)
         # Update the positions of the sprites
-        # self.ninja_frog_pos[0] += self.sprite_speed
-        # self.mask_dude_pos[0] += self.sprite_speed
+        self.ninja_frog_pos[0] += self.sprite_speed
+        self.mask_dude_pos[0] += self.sprite_speed
 
-        # # Wrap around the screen if they go off the edge
-        # screen_width = 800  # Assuming your screen width is 800
-        # if self.ninja_frog_pos[0] > screen_width:
-        #     self.ninja_frog_pos[0] = -self.character_sprites['NinjaFrog']['run'][0].get_width()
-        # if self.mask_dude_pos[0] > screen_width:
-        #     self.mask_dude_pos[0] = -self.character_sprites['MaskDude']['run'][0].get_width()
+        # Calculate the distance between the sprites
+        distance_between_sprites = self.mask_dude_pos[0] - self.ninja_frog_pos[0]
+        fixed_rope_length = 150  # Set this to your desired fixed rope length
 
-        # # Update animation frames
-        # current_time = pygame.time.get_ticks()
-        # if current_time % 50 == 0:  # Change frame every 50 milliseconds
-        #     self.ninja_frog_frame = (self.ninja_frog_frame + 1) % len(self.character_sprites['NinjaFrog']['run'])
-        #     self.mask_dude_frame = (self.mask_dude_frame + 1) % len(self.character_sprites['MaskDude']['run'])
+        # Adjust positions to maintain fixed rope length
+        if distance_between_sprites > fixed_rope_length:
+            self.mask_dude_pos[0] = self.ninja_frog_pos[0] + fixed_rope_length
 
+        # Ensure characters don't move off-screen
+        screen_width = 800  # Assuming your screen width is 800
+        if self.ninja_frog_pos[0] < 0:
+            self.ninja_frog_pos[0] = 0
+        if self.mask_dude_pos[0] + self.mask_dude_sprite.get_width() > screen_width:
+            self.mask_dude_pos[0] = screen_width - self.mask_dude_sprite.get_width()
+
+        # Update animation frames
+        current_time = pygame.time.get_ticks()
+        if current_time % 50 == 0:  # Change frame every 50 milliseconds
+            self.ninja_frog_frame = (self.ninja_frog_frame + 1) % len(self.character_sprites['NinjaFrog']['run'])
+            self.mask_dude_frame = (self.mask_dude_frame + 1) % len(self.character_sprites['MaskDude']['run'])
+
+        # Server creation logic
         if self.create_server:
             ip_address = self.ip_input_Server.get_text()
             port = int(self.port_input_Server.get_text())
 
-            def start_server_thread():  # Create a function to start the server in a thread
+            def start_server_thread():  # Function to start the server in a thread
                 self.server = Server(ip_address, port)
-                self.server.start_server()  # Start the server (which internally handles client connections)
+                self.server.start_server()
 
             server_thread = Thread(target=start_server_thread)
             server_thread.start()
 
-            
+            print("Server has been created")
             self.create_server = False  # Reset the flag
 
+        # State switching logic
         if self.switch_state:
-            # return GameState.CHARACTER_SELECT  # Return the new desired state
             ip_address = self.ip_input.get_text()
-            port = int(self.port_input.get_text())  # Assuming port input is numerical
+            port = int(self.port_input.get_text())
             self.client_script.network = Network(ip_address, port)
             return "MAIN MENU"
 
@@ -195,8 +201,11 @@ class JoinGameScreen:
             mask_dude_current_frame = self.character_sprites['MaskDude']['run'][self.mask_dude_frame]
 
             # Draw the rope connecting the sprites
-            rope_end_pos = (self.mask_dude_pos[0] + mask_dude_current_frame.get_width() // 2, self.mask_dude_pos[1])
-            pygame.draw.line(screen, self.rope_color, self.ninja_frog_pos, rope_end_pos, self.rope_width)
+            ninja_frog_center = (self.ninja_frog_pos[0] + self.ninja_frog_sprite.get_width() // 2,
+                                 self.ninja_frog_pos[1] + self.ninja_frog_sprite.get_height() // 2)
+            mask_dude_center = (self.mask_dude_pos[0] + self.mask_dude_sprite.get_width() // 2,
+                                self.mask_dude_pos[1] + self.mask_dude_sprite.get_height() // 2)
+            pygame.draw.line(screen, self.rope_color, ninja_frog_center, mask_dude_center, self.rope_width)
 
             # Draw the sprites
             screen.blit(ninja_frog_current_frame, self.ninja_frog_pos)

@@ -34,7 +34,7 @@ class ClientHandler:
         ClientHandler.client_count += 1
 
     def add_player(self, id, character_name):
-        player = Player(id, character_name, 'idle', 'right', (200 if id == 0 else 300), 350, 50, 50,
+        player = Player(id, character_name, 'idle', 'right', (200 if id == 0 else 300), 950, 50, 50,
                         (255, 0, 255 if id == 0 else 255, 200, 255))
         self.server.players.append(player)
 
@@ -281,21 +281,17 @@ class Server:
             if self.rope:
                 self.rope.update()
 
-            if not self.lavaColl:
-                for lava in self.lavaBlocks:
-                    lava.update()
-                self.BiglavaBlock.update()
+           
 
-
-            if player.collision:
-                player.action = 'died'
-                self.lavaColl = True
 
             
-            if not self.lavaColl:
-                for lava in self.lavaBlocks:
-                    lava.update()
-                self.BiglavaBlock.update()
+                
+
+            
+            # if not self.lavaColl:
+            #     for lava in self.lavaBlocks:
+            #         lava.update()
+            #     self.BiglavaBlock.update()
 
 
             if player.collision:
@@ -315,13 +311,13 @@ class Server:
 
 
     def CreateBigLavaBlock(self):
-        self.BiglavaBlock = Lava(99, -480, 960, 2000, 2000)
+        self.BiglavaBlock = Lava(99, -480, 1360, 2000, 2000)
 
     def CreateLava(self):
         for i in range(10):
             ##each lava width is 48 pixels, so draw every 48 pixels accross screen.
             ## we want to draw them 64*however many blocks depths we have in self.map in order for the lava to spawn at bottom of map
-            lava = Lava(i, (i * 160)-480, 800, 160, 160)
+            lava = Lava(i, (i * 160)-480, 1200, 160, 160)
             self.lavaBlocks.append(lava)
 
     def create_rope_if_needed(self):

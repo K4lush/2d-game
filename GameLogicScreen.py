@@ -167,8 +167,11 @@ class GameLogicScreen:
             block_height = 32
             block_width = 32
           
-            num_blocks_horizontal = self.screen_width // block_width + 1
-            num_blocks_vertical = self.screen_height // block_height + 1
+           
+
+            num_blocks_horizontal = 3000 // block_width + 1
+            num_blocks_vertical = 3000 // block_height + 1
+
 
             
 
@@ -180,6 +183,7 @@ class GameLogicScreen:
                     if block_x < self.screen_width and block_y < self.screen_height:  # Draw only within the screen boundaries
                         block_rect = pygame.Rect(block_x, block_y, block_width, block_height)
                         screen.blit(self.settings.background_image, block_rect)
+                        
 
         
 

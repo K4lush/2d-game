@@ -99,6 +99,7 @@ class Player:
             if self.rect.colliderect(platform):
                 collision_side = self.get_collision_side(platform)
                 print(f"Collision detected on {collision_side}")  # Debugging print
+                print("this is y value: ",self.y)
 
                 if collision_side == "bottom":
                     self.y = platform.top - self.height

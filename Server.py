@@ -144,8 +144,8 @@ class Server:
             # self.update_game_state()
 
     def createArrows(self):
-        Arrow1 = Arrows(1,250,380,40,40)
-        Arrow2 = Arrows(2,550,380,40,40)
+        Arrow1 = Arrows(1,250,380,60,60)
+        Arrow2 = Arrows(2,550,380,60,60)
         self.Arrows.append(Arrow1)
         self.Arrows.append(Arrow2)
 
@@ -158,7 +158,7 @@ class Server:
     #             print(f"SERVER: Broadcasting client {client_handler.id}")
     #             self.broadcast_to_client(client_handler.client)
     def createFlag(self):
-        self.flag = Flag('flag', 300 , 500, 50, 50, 'ungotten')
+        self.flag = Flag('flag', 300 , 350, 50, 50, 'ungotten')
 
     def add_client_handler(self, client_handler):
         with self.lock:
@@ -281,7 +281,7 @@ class Server:
             player.handleLavaCollisions(self.lavaBlocks)
             player.hanldeFlagCollision(self.flag)
             player.updateScore()
-            print("thsi is player score from server: ",player.score)
+           
             # 5. Update Rope (if it exists)
             if self.rope:
                 self.rope.update()

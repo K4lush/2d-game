@@ -7,7 +7,6 @@ from Network import Network
 from Server import Server
 from threading import Thread
 from Music import MusicPlayer
-from Rope import Rope
 
 import pygame
 
@@ -143,21 +142,21 @@ class JoinGameScreen:
     def update(self):
         # print(self.current_state)
         # Update the positions of the sprites
-        self.ninja_frog_pos[0] += self.sprite_speed
-        self.mask_dude_pos[0] += self.sprite_speed
+        # self.ninja_frog_pos[0] += self.sprite_speed
+        # self.mask_dude_pos[0] += self.sprite_speed
 
-        # Wrap around the screen if they go off the edge
-        screen_width = 800  # Assuming your screen width is 800
-        if self.ninja_frog_pos[0] > screen_width:
-            self.ninja_frog_pos[0] = -self.character_sprites['NinjaFrog']['run'][0].get_width()
-        if self.mask_dude_pos[0] > screen_width:
-            self.mask_dude_pos[0] = -self.character_sprites['MaskDude']['run'][0].get_width()
+        # # Wrap around the screen if they go off the edge
+        # screen_width = 800  # Assuming your screen width is 800
+        # if self.ninja_frog_pos[0] > screen_width:
+        #     self.ninja_frog_pos[0] = -self.character_sprites['NinjaFrog']['run'][0].get_width()
+        # if self.mask_dude_pos[0] > screen_width:
+        #     self.mask_dude_pos[0] = -self.character_sprites['MaskDude']['run'][0].get_width()
 
-        # Update animation frames
-        current_time = pygame.time.get_ticks()
-        if current_time % 50 == 0:  # Change frame every 50 milliseconds
-            self.ninja_frog_frame = (self.ninja_frog_frame + 1) % len(self.character_sprites['NinjaFrog']['run'])
-            self.mask_dude_frame = (self.mask_dude_frame + 1) % len(self.character_sprites['MaskDude']['run'])
+        # # Update animation frames
+        # current_time = pygame.time.get_ticks()
+        # if current_time % 50 == 0:  # Change frame every 50 milliseconds
+        #     self.ninja_frog_frame = (self.ninja_frog_frame + 1) % len(self.character_sprites['NinjaFrog']['run'])
+        #     self.mask_dude_frame = (self.mask_dude_frame + 1) % len(self.character_sprites['MaskDude']['run'])
 
         if self.create_server:
             ip_address = self.ip_input_Server.get_text()

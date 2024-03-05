@@ -4,7 +4,7 @@ import pygame
 class Flag(pygame.sprite.Sprite):
     """A class representing a lava object in a game, animated and scalable."""
 
-    def __init__(self, id, x, y, width, height, action):
+    def __init__(self, id, x, y, width, height, action, collision=False):
         """Initializes the lava object with position, dimensions, animation frames, and scaling factor."""
         super().__init__()
         self.id = id
@@ -12,6 +12,7 @@ class Flag(pygame.sprite.Sprite):
         self.y = y
         self.width = width
         self.height = height
+        self.collision = collision
         self.action = action
         self.rect = pygame.Rect(x, y, width, height)
         
@@ -27,7 +28,8 @@ class Flag(pygame.sprite.Sprite):
             'y': self.y,
             'width': self.width,
             'height': self.height,
-            'action': self.action
+            'action': self.action,
+            'collision':self.collision
 
            
             }

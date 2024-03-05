@@ -120,7 +120,11 @@ class Player:
     def hanldeFlagCollision(self, flags):
         if self.rect.colliderect(flags.rect):
             flags.action = 'gotten'
-            self.flagCollision = True
+            if flags.collision is False:
+                self.score += 100
+                flags.collision = True
+            #self.flagCollision = True
+            
             
 
 

@@ -93,7 +93,7 @@ class Settings:
         for i in range(num_frames):
             frame = arrow_sheet.subsurface((i * frame_width, 0, frame_width, frame_height))
             # scaled_frame = pygame.transform.scale(frame,
-            #                                       (frame_width, frame_height))  # Scale frame by a factor of 3
+            #                                       (2, 2))  # Scale frame by a factor of 3
             arrow_frames.append(frame)
 
         return arrow_frames

@@ -322,7 +322,7 @@ class Server:
 
     def create_rope_if_needed(self):
         if len(self.players) == 2 and not self.rope_created:
-            self.rope = Rope(self.players[0], self.players[1], 150)
+            self.rope = Rope(self.players[0], self.players[1], 200)
             self.rope_created = True
 
     def create_platform_rects(self):

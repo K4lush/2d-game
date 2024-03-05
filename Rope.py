@@ -17,6 +17,7 @@ class Rope:
 
         # 2. Check if rope needs to pull a player
         if distance > self.max_length:
+            
             pull_amount = distance - self.max_length
 
             # Normalize (calculate direction with magnitude 1)
@@ -28,9 +29,11 @@ class Rope:
                 direction_y = 0
 
             # Apply pull (assuming equal force on both players for now)
+            self.player1.y += direction_y * pull_amount / 2
             self.player1.x += direction_x * pull_amount / 2
             self.player1.update_rect()
             self.player2.x -= direction_x * pull_amount / 2
+            self.player2.y -= direction_y * pull_amount / 2
             self.player2.update_rect()
 
     def to_json(self):

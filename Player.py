@@ -106,23 +106,23 @@ class Player:
                 print("this is y value: ",self.y)
 
                 if collision_side == "bottom":
-                    self.VerticalCollision is True
+                    self.VerticalCollision = True
                     self.y = platform.top - self.height
                     self.on_ground = True
                     self.jump_velocity = 0
 
                 elif collision_side == "top":
                     self.y = platform.bottom
-                    self.VerticalCollision is True
+                    self.VerticalCollision = True
                     self.jump_velocity = 0
 
                 elif collision_side == "left":
                     self.x = platform.right
-                    self.horizontalCollision is True
+                    self.horizontalCollision = True
 
                 elif collision_side == "right":
                     self.x = platform.left - self.width
-                    self.horizontalCollision is True
+                    self.horizontalCollision = True
 
             self.update_rect()
 

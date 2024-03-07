@@ -9,6 +9,7 @@ from threading import Thread
 from Music import MusicPlayer
 
 import pygame
+import pygame.mixer
 import random
 
 class JoinGameScreen:
@@ -107,6 +108,12 @@ class JoinGameScreen:
                 self.moving_sprites.append(sprite)
 
         self.server_started_message = ""  # Initially an empty string
+
+        pygame.mixer.init()
+        self.game_load_sound = pygame.mixer.Sound('assets/SoundEffects/b4d2-9773-41c3-9c23-86c6cfac77eb.mp3')
+
+        self.game_load_sound.play()
+
 
     def handle_event(self, events):
         for event in events:  # Iterate through the events

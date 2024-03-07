@@ -34,7 +34,7 @@ class ClientHandler:
         ClientHandler.client_count += 1
 
     def add_player(self, id, character_name):
-        player = Player(id, character_name, 'idle', 'right', (200 if id == 0 else 300), 950, 50, 50,
+        player = Player(id, character_name, 'idle', 'right', (200 if id == 0 else 300), 2380, 50, 50,
                         (255, 0, 255 if id == 0 else 255, 200, 255))
         self.server.players.append(player)
 
@@ -126,6 +126,7 @@ class Server:
         self.createFlag()
         self.playerSprites = self.load_characters_sprites()
         self.createArrows()
+        self.twoPlayers = False
 
         # self.start_server()
 
@@ -270,6 +271,10 @@ class Server:
             if not player.on_ground:
                 player.apply_gravity()
 
+            if len(self.players) == 2:
+                self.players[0].twoPlayers = True
+                self.players[1].twoPlayers = True
+
             # # 4. Handle Collisions
             player.handle_collisions(self.platforms)  # Assuming you have a list of platforms
             #player.handlePixelPerfectCollisions(self.platforms, self.playerSprites)
@@ -311,13 +316,13 @@ class Server:
 
 
     def CreateBigLavaBlock(self):
-        self.BiglavaBlock = Lava(99, -480, 1360, 2000, 2000)
+        self.BiglavaBlock = Lava(99, -480, 3160, 2000, 2000)
 
     def CreateLava(self):
         for i in range(10):
             ##each lava width is 48 pixels, so draw every 48 pixels accross screen.
             ## we want to draw them 64*however many blocks depths we have in self.map in order for the lava to spawn at bottom of map
-            lava = Lava(i, (i * 160)-480, 1200, 160, 160)
+            lava = Lava(i, (i * 160)-480, 3000, 160, 160)
             self.lavaBlocks.append(lava)
 
     def create_rope_if_needed(self):
@@ -333,11 +338,11 @@ class Server:
         for row_index, row in enumerate(self.settings.map):
             for col_index, cell in enumerate(row):
                 if cell == 1:  # 1 represents a block
-                    block_rect = pygame.Rect(col_index * block_width, row_index * block_height, block_width,
+                    block_rect = pygame.Rect((col_index * block_width)-300, row_index * block_height, block_width,
                                              block_height)
                     platforms.append(block_rect)
                 if cell == 3:
-                    block_rect = pygame.Rect(col_index * block_width, row_index * block_height, block_width,
+                    block_rect = pygame.Rect((col_index * block_width)-300, row_index * block_height, block_width,
                                              block_height)
                     self.nonBlockingPlatforms.append(block_rect)
 

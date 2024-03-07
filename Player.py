@@ -32,6 +32,7 @@ class Player:
         
 
         self.score = 0
+        self.twoPlayers = False
        
 
         print("Player Width:", self.rect.width)
@@ -78,7 +79,8 @@ class Player:
             'rect_centerx': self.rect.centerx,  # Add rect.centerx
             'rect_centery': self.rect.centery,  # Add rect.centery
             'collision':self.collision,
-            'score':self.score
+            'score':self.score,
+            'twoPlayers':self.twoPlayers
             # ... other necessary attributes ...
         }
 
@@ -86,7 +88,7 @@ class Player:
         current_time = time.time()
 
         """Starts a jump if the player is standing on the ground."""
-        print("PLAYER: Should be jumping")
+        
         if self.on_ground and current_time - self.last_jump_time > self.jump_cooldown:
             self.jump_velocity = -15  # Negative velocity means upwards jump
             self.is_jumping = True
@@ -102,8 +104,7 @@ class Player:
         for platform in platforms:
             if self.rect.colliderect(platform):
                 collision_side = self.get_collision_side(platform)
-                print(f"Collision detected on {collision_side}")  # Debugging print
-                print("this is y value: ",self.y)
+               
 
                 if collision_side == "bottom":
                     self.VerticalCollision = True

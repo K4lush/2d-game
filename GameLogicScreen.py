@@ -22,11 +22,12 @@ class GameLogicScreen:
         self.screen_height = 600
         self.font_size = 30
         self.alpha_value = 0
+        self.Alpha_value = 255
         self.gameOver = False
-        self.screen_width = 800
-        self.screen_height = 600
-        self.font_size = 30
-        self.alpha_value = 0
+        
+       
+        self.FS = 20
+      
 
         ### ROPE VALUES TO BE MOVED ###
         self.player1 = None
@@ -40,6 +41,8 @@ class GameLogicScreen:
         self.Arrows = None
         self.score = 0
         self.resetGame = False
+        self.backgroundCounter = 0
+        self.showInstructions = True
 
     def fade_in_game_over(self, screen):
            
@@ -62,9 +65,54 @@ class GameLogicScreen:
             screen.blit(text, ((self.screen_width - text_width) // 2, (self.screen_height - text_height) // 2))  # Center the text
             screen.blit(score_text, ((self.screen_width - score_text_width) // 2, (self.screen_height - text_height) // 2 + text_height + 10))
             
+    def fade_out_countdown(self, screen):
+            font = pygame.font.Font(None, self.font_size)
 
+            text = font.render("LAVA INBOUND - RUN", True, (255, 255, 255))
+            text_width, text_height = font.size("LAVA INBOUND - RUN")
 
+            if text_width < self.screen_width and text_height < self.screen_height:
+                self.font_size += 5  # Increase the font size
+            self.Alpha_value -= 5  # Decrease the alpha value
+            if self.Alpha_value < 0:
+                self.Alpha_value = 0  # Ensure alpha doesn't go below 0
+                self.stopCountdown = True
+            text.set_alpha(self.Alpha_value)
             
+            screen.blit(text, ((self.screen_width - text_width) // 2, (self.screen_height - text_height) // 2))  # Center the text
+    
+    def printInstructions(self, screen):
+        font_path = "assets/fonts/SC.ttf"  # Path to the custom font file
+        font = pygame.font.Font(font_path, self.FS)
+
+        # Instructions split into three lines
+        line1 = "Reach The Top of the Map"
+        line2 = "Before the Lava Catches You!"
+        line3 = "Collect as the flags"
+        line4 = "on your way to earn more points!"
+        lines = [line1, line2, line3, line4]  # Add more lines if needed
+
+        # Render each line separately and get the max width and total height
+        text_surfaces = []
+        total_height = 0
+        max_width = 0
+        for line in lines:
+            text_surface = font.render(line, True, (255, 255, 255))
+            text_width, text_height = font.size(line)
+            total_height += text_height
+            max_width = max(max_width, text_width)
+            text_surfaces.append((text_surface, text_width, text_height))
+
+        # Render each line at the top left corner of the screen
+        x = 10  # Adjust the horizontal position as needed
+        y = 10  # Adjust the vertical position as needed
+        for text_surface, _, text_height in text_surfaces:
+            screen.blit(text_surface, (x, y))
+            y += text_height  # Move down to the next line
+
+        # Optional: Draw a rectangle around the instructions
+        pygame.draw.rect(screen, (255, 255, 255), (x - 5, 5, max_width + 10, total_height), 2)
+
 
     def handle_event(self, keys):
 
@@ -124,8 +172,7 @@ class GameLogicScreen:
             self.Arrows = data['Arrow']
            
             
-
-
+        
 
 
 
@@ -163,6 +210,16 @@ class GameLogicScreen:
        
 
         return camera_offset_x, camera_offset_y
+    
+    def get_camera_view_coordinates(self, camera_offset_x, camera_offset_y):
+    # Calculate the visible area based on camera position and screen size
+        top_left_x = camera_offset_x
+        top_left_y = camera_offset_y
+        bottom_right_x = camera_offset_x + self.screen_width
+        bottom_right_y = camera_offset_y + self.screen_height
+
+        return top_left_x, top_left_y, bottom_right_x, bottom_right_y
+
 
     def render(self, screen):
 
@@ -170,6 +227,11 @@ class GameLogicScreen:
 
 
         camera_offset_x, camera_offset_y = self.calculate_camera_offset(self.players)
+        cameraInfo = self.get_camera_view_coordinates(camera_offset_x, camera_offset_y)
+        topLeftX = cameraInfo[0]
+        topLeftY = cameraInfo[1]
+        bottomRightX = cameraInfo[2]
+        bottomRightY = cameraInfo[3]
         if self.settings.background_image:
             block_height = 32
             block_width = 32
@@ -185,14 +247,13 @@ class GameLogicScreen:
             # Draw the background blocks
             for row in range(num_blocks_vertical):
                 for col in range(num_blocks_horizontal):
-                    block_x = col * block_width - camera_offset_x
-                    block_y = row * block_height - camera_offset_y
+                    block_x = topLeftX + col * block_width  - camera_offset_x -300
+                    block_y = topLeftY + row * block_height - camera_offset_y
                     if block_x < self.screen_width and block_y < self.screen_height:  # Draw only within the screen boundaries
-                        block_rect = pygame.Rect(block_x, block_y, block_width, block_height)
+                        block_rect = pygame.Rect(block_x, block_y + self.backgroundCounter, block_width, block_height)
                         screen.blit(self.settings.background_image, block_rect)
-                        
 
-        
+            #self.backgroundCounter += 2
 
         for block in self.settings.platforms:
             if block.sprite:  # Ensure a sprite is assigned
@@ -224,7 +285,9 @@ class GameLogicScreen:
                     my_font = pygame.font.SysFont('Comic Sans MS', 30)
                     text_surface = my_font.render(str(self.score), True, (255, 255, 255))  # Convert score to a string
                     screen.blit(text_surface, (20 , 20))  # Use a tuple for coordinates
-
+                # if self.players[0]['twoPlayers'] == True:
+                #     self.showCountdown = True
+                #     print("CLIENT KNOWS THERE ARE TWO PLAYERS")
                 
 
 
@@ -254,7 +317,22 @@ class GameLogicScreen:
                     sprite.draw(screen, (lava['lavaX'] - camera_offset_x, lava['lavaY'] - camera_offset_y))
                     # sprite.draw(screen, (lava.x - camera_offset_x, lava.y - camera_offset_y))
 
-        
+        # if self.showCountdown and not self.stopCountdown:
+        #     self.fade_out_countdown(screen)
+        #     print("FADEOUT METHOD CALLED")
+        if self.players:
+            if len(self.players) == 2:
+
+                if self.showInstructions: 
+                    self.printInstructions(screen)
+                    if self.players[0]['y'] <2200 or self.players[1]['y'] < 2200:
+                        self.showInstructions = False
+
+            else:
+                if self.showInstructions: 
+                    self.printInstructions(screen)
+                    if self.players[0]['y'] <2200:
+                        self.showInstructions = False
 
 
 

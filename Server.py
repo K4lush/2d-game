@@ -157,18 +157,19 @@ class Server:
         
         self.flag1 = Flag('flag', 16*32 , (100*32)-75, 75, 75, 'ungotten')
         self.flag2 = Flag('flag', 18*32 , (90*32)-75, 75, 75, 'ungotten')
-        self.flag3 = Flag('flag', 10*32 , (80*32)-75, 75, 75, 'ungotten')
-        self.flag4 = Flag('flag', 11*32 , (70*32)-75, 75, 75, 'ungotten')
-        self.flag5 = Flag('flag', 12*32 , (60*32)-75, 75, 75, 'ungotten')
-        self.flag6 = Flag('flag', 13*32 , (50*32)-75, 75, 75, 'ungotten')
-        self.flag7 = Flag('flag', 14*32 , (40*32)-75, 75, 75, 'ungotten')
+        #
+        self.flag3 = Flag('flag', 10*32 , (80*32)-100, 75, 75, 'ungotten')
+        # self.flag4 = Flag('flag', 11*32 , (70*32)-75, 75, 75, 'ungotten')
+        # self.flag5 = Flag('flag', 12*32 , (60*32)-75, 75, 75, 'ungotten')
+        # self.flag6 = Flag('flag', 13*32 , (50*32)-75, 75, 75, 'ungotten')
+        # self.flag7 = Flag('flag', 14*32 , (40*32)-75, 75, 75, 'ungotten')
         self.flags.append(self.flag1)
         self.flags.append(self.flag2)
         self.flags.append(self.flag3)
-        self.flags.append(self.flag4)
-        self.flags.append(self.flag5)
-        self.flags.append(self.flag6)
-        self.flags.append(self.flag7)
+        # self.flags.append(self.flag4)
+        # self.flags.append(self.flag5)
+        # self.flags.append(self.flag6)
+        # self.flags.append(self.flag7)
 
     def add_client_handler(self, client_handler):
         with self.lock:

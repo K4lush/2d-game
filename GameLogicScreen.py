@@ -24,7 +24,7 @@ class GameLogicScreen:
         self.alpha_value = 0
         self.Alpha_value = 255
         self.gameOver = False
-        
+        self.win = False
        
         self.FS = 20
       
@@ -267,6 +267,9 @@ class GameLogicScreen:
         # if not self.gameOver:
         if self.players:
                 for player in self.players:
+                    if player['y'] <= 0:  # Assuming win_height is the y-coordinate that defines the top
+                        self.win = True
+
                     id = player['id']
                     character = player['character']
                     action = player['action']
@@ -379,10 +382,26 @@ class GameLogicScreen:
 
                 # Don't forget to update the display
             pygame.display.flip()
-        
+
+
+
+
         if self.gameOver is True:
             
             self.fade_in_game_over(screen)
+
+        if self.win:
+            self.display_win_message(screen)
+
+        # self.get_camera_view_coordinates()
+
+    def display_win_message(self, screen):
+        if self.win:
+            win_font = pygame.font.Font(None, 100)
+            win_msg = win_font.render("You Won!", True, (255, 215, 0))
+            msg_width, msg_height = win_font.size("You Won!")
+            screen.blit(win_msg, ((800 - msg_width) // 2, (800 - msg_height) // 2))
+
 
 
 

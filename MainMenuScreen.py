@@ -54,6 +54,13 @@ class MainMenuScreen:
                                          text='Select Character',
                                         font='assets/fonts/SC.ttf')
 
+        self.how_to_play_button = Button(250, 400, 300, 60, color=(207, 185, 151),
+                                         highlight_color=(207, 185, 151), font_color=(255, 255, 255), font_size=24,
+                                         text='How to Play',
+                                         font='assets/fonts/SC.ttf')
+        self.show_how_to_play = False  # Flag to toggle the display of instructions
+
+        self.show_how_to_play_sprite = pygame.image.load('assets/menu/Buttons/Achievements.png').convert_alpha()
         self.play_game_sprite = pygame.image.load('assets/menu/Buttons/Play.png').convert_alpha()
         self.settings_sprite = pygame.image.load('assets/menu/Buttons/Settings.png').convert_alpha()
 
@@ -67,6 +74,10 @@ class MainMenuScreen:
             self.settings_sprite,
             (button_height, button_height)  # New width and height
         )
+        self.show_how_to_play_sprite = pygame.transform.scale(
+            self.show_how_to_play_sprite,
+            (button_height, button_height)
+        )
 
 
 
@@ -76,7 +87,9 @@ class MainMenuScreen:
                 pygame.quit()
                 return
             elif event.type == pygame.MOUSEBUTTONDOWN:
-               
+
+                if self.how_to_play_button.rect.collidepoint(pygame.mouse.get_pos()):
+                    self.toggle_how_to_play()
 
                 if self.start_button.rect.collidepoint(pygame.mouse.get_pos()):
                     self.switch_state = True
@@ -99,11 +112,8 @@ class MainMenuScreen:
                 if self.virtual_button.rect.collidepoint(pygame.mouse.get_pos()):
                     self.character = 'VirtualGuy'
 
-
-
-
-
-
+    def toggle_how_to_play(self):
+        self.show_how_to_play = not self.show_how_to_play
 
     def update(self):
        
@@ -137,6 +147,25 @@ class MainMenuScreen:
 
 
         if self.current_state == "MAIN":
+            self.how_to_play_button.draw(screen)
+            if self.show_how_to_play:
+                # Draw "How to Play" instructions
+                how_to_play_text = [
+                    "Welcome to Rope Runners! YUPPA! The objective of the game",
+                    "is to keep going up, gather as much points and survive the lava.",
+                    "If a flag is collided with an extra 100 points are awarded.",
+                    "Remember... work together. Have Fun!"
+                ]
+                font = pygame.font.Font("assets/fonts/SC.ttf", 20)
+                text_start_y = 480
+                line_spacing = 5  # Adjust the line spacing as needed
+
+                for line in how_to_play_text:
+                    rendered_text = font.render(line, True, (255, 255, 255))
+                    text_rect = rendered_text.get_rect(center=(400, text_start_y))
+                    screen.blit(rendered_text, text_rect)
+                    text_start_y += font.get_height() + line_spacing
+
             self.start_button.draw(screen)
             self.select_character_button.draw(screen)
 
@@ -149,6 +178,10 @@ class MainMenuScreen:
             settings_sprite_x = self.select_character_button.rect.right + 10  # 10 pixels to the right
             settings_sprite_y = self.select_character_button.rect.y
             screen.blit(self.settings_sprite, (settings_sprite_x, settings_sprite_y))
+
+            how_to_play_sprite_x = self.how_to_play_button.rect.right + 10  # 10 pixels to the right
+            how_to_play_sprite_y = self.how_to_play_button.rect.y
+            screen.blit(self.show_how_to_play_sprite, (how_to_play_sprite_x, how_to_play_sprite_y))
 
         elif self.current_state == "SHOW CHARACTER":
             self.ninja_button.draw(screen)

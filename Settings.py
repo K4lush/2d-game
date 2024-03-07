@@ -83,7 +83,7 @@ class Settings:
     [3,3,3,3,3,3,3,3, 3, 3, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
     [3,3,3,3,3,3,3,3, 3, 3, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
     [3,3,3,3,3,3,3,3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
-    [3.3,3,3,3,3,3,3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    [3,3,3,3,3,3,3,3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
     [3,3,3,3,3,3,3,3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
 ]
         print(len(self.map))
@@ -319,21 +319,22 @@ class Settings:
         pass
 
     def updateFlagSprites(self,flag):
-        id = flag['id']
-        x = flag['x']
-        y = flag['y']
-        width = flag['width']
-        height = flag['width']
-        action = flag['action']
+        for f in flag:
+            id = f['id']
+            x = f['x']
+            y = f['y']
+            width = f['width']
+            height = f['width']
+            action = f['action']
 
-        spriteKey = f'{id}_{action}'
-        if spriteKey not in self.flagSpritesDict:
-            frames = self.flagSprites[action]
-            self.flagSpritesDict[spriteKey] = AnimatedSprite(frames, frame_rate=50)
-        sprite = self.flagSpritesDict[spriteKey]
-        if sprite.flagDone is True:
-            action = 'idle'
-        sprite.update(action)
+            spriteKey = f'{id}_{action}'
+            if spriteKey not in self.flagSpritesDict:
+                frames = self.flagSprites[action]
+                self.flagSpritesDict[spriteKey] = AnimatedSprite(frames, frame_rate=50)
+            sprite = self.flagSpritesDict[spriteKey]
+            if sprite.flagDone is True:
+                action = 'idle'
+            sprite.update(action)
         
 
 

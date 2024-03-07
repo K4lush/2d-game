@@ -293,12 +293,13 @@ class GameLogicScreen:
 
 
         if self.flag:
-            id = self.flag['id']
-            action = self.flag['action']
-            key = f'{id}_{action}'
-            if key in self.settings.flagSpritesDict:
-                sprite = self.settings.flagSpritesDict[key]
-                sprite.draw(screen, (self.flag['x']- camera_offset_x, self.flag['y']- camera_offset_y))
+            for flag in self.flag:
+                id = flag['id']
+                action = flag['action']
+                key = f'{id}_{action}'
+                if key in self.settings.flagSpritesDict:
+                    sprite = self.settings.flagSpritesDict[key]
+                    sprite.draw(screen, (flag['x']- camera_offset_x, flag['y']- camera_offset_y))
 
         if self.Arrows:
    

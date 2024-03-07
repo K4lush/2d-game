@@ -133,12 +133,13 @@ class Player:
             self.update_rect()
 
     def hanldeFlagCollision(self, flags):
-        if self.rect.colliderect(flags.rect):
-            flags.action = 'gotten'
-            if flags.collision is False:
-                self.score += 100
-                flags.collision = True
-            #self.flagCollision = True
+        for flag in flags:
+            if self.rect.colliderect(flag.rect):
+                flag.action = 'gotten'
+                if flag.collision is False:
+                    self.score += 100
+                    flag.collision = True
+                #self.flagCollision = True
             
             
 

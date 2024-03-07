@@ -119,6 +119,7 @@ class MainMenuScreen:
        
 
         if self.switch_state:
+            self.switch_state = False
             return "PLAYING"
 
         # In your select_character method's loop

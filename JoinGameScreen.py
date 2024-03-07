@@ -187,6 +187,7 @@ class JoinGameScreen:
 
         # State switching logic
         if self.switch_state:
+            self.switch_state = False
             ip_address = self.ip_input.get_text()
             port = int(self.port_input.get_text())
             self.client_script.network = Network(ip_address, port)

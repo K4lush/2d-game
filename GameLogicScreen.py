@@ -60,6 +60,7 @@ class GameLogicScreen:
             self.alpha_value += 5  # Increase the alpha value
             if self.alpha_value > 255:
                 self.alpha_value = 255  # Ensure alpha doesn't exceed 255
+                self.resetGame = True
             text.set_alpha(self.alpha_value)
             score_text.set_alpha(self.alpha_value)
             screen.blit(text, ((self.screen_width - text_width) // 2, (self.screen_height - text_height) // 2))  # Center the text
@@ -136,10 +137,12 @@ class GameLogicScreen:
         return pressed_keys if pressed_keys else ['idle'] 
         
     def update(self, data):
-       
-        if self.settings.gameOver is True:
-          
+        if self.settings.gameOver:
             self.gameOver = True
+
+        if self.resetGame:
+            self.resetGame = False
+            return "GAME OVER"
        
         
         if 'Players' in data and data['Players'] is not None:

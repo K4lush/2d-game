@@ -118,7 +118,7 @@ class Server:
         self.BiglavaBlock = None
         self.lavaColl = False
         self.lavaColl = False
-        self.flag = None
+        self.flags = []
         self.CreateLava()
         self.nonBlockingPlatforms = []
         self.platforms = self.create_platform_rects()  # Create platform rects
@@ -154,7 +154,22 @@ class Server:
 
   
     def createFlag(self):
-        self.flag = Flag('flag', 300 , 350, 75, 75, 'ungotten')
+        
+        self.flag1 = Flag('flag', 16*32 , (100*32)-75, 75, 75, 'ungotten')
+        self.flag2 = Flag('flag', 18*32 , (90*32)-75, 75, 75, 'ungotten')
+        #
+        self.flag3 = Flag('flag', 10*32 , (80*32)-100, 75, 75, 'ungotten')
+        # self.flag4 = Flag('flag', 11*32 , (70*32)-75, 75, 75, 'ungotten')
+        # self.flag5 = Flag('flag', 12*32 , (60*32)-75, 75, 75, 'ungotten')
+        # self.flag6 = Flag('flag', 13*32 , (50*32)-75, 75, 75, 'ungotten')
+        # self.flag7 = Flag('flag', 14*32 , (40*32)-75, 75, 75, 'ungotten')
+        self.flags.append(self.flag1)
+        self.flags.append(self.flag2)
+        self.flags.append(self.flag3)
+        # self.flags.append(self.flag4)
+        # self.flags.append(self.flag5)
+        # self.flags.append(self.flag6)
+        # self.flags.append(self.flag7)
 
     def add_client_handler(self, client_handler):
         with self.lock:
@@ -173,13 +188,13 @@ class Server:
           
 
         block = self.BiglavaBlock.to_json()
-        flag = self.flag.to_json()
+        # flags = self.flag.to_json()
 
        
             
 
         block = self.BiglavaBlock.to_json()
-        flag = self.flag.to_json()
+        
 
        
         gameState = {
@@ -194,12 +209,9 @@ class Server:
 
             'LavaBlock':block,
 
-            'Flag':flag,
+            'Flag':[flag.to_json() for flag in self.flags],
 
             'Arrow': [arrow.to_json() for arrow in self.Arrows]
-
-
-            
         }
 
 
@@ -279,7 +291,7 @@ class Server:
             player.handle_collisions(self.platforms)  # Assuming you have a list of platforms
             #player.handlePixelPerfectCollisions(self.platforms, self.playerSprites)
             player.handleLavaCollisions(self.lavaBlocks)
-            player.hanldeFlagCollision(self.flag)
+            player.hanldeFlagCollision(self.flags)
             player.updateScore()
            
             # 5. Update Rope (if it exists)

@@ -1,5 +1,6 @@
 import pygame
 import time
+import pygame.mixer
 
 class Player:
     
@@ -13,6 +14,9 @@ class Player:
         self.highest_y = self.y
         self.horizontalCollision = False
         self.VerticalCollision = False
+
+        pygame.mixer.init()
+        self.jump_sound = pygame.mixer.Sound('assets/SoundEffects/JumpSound.mp3')
         
         self.width = width
         self.height = height
@@ -95,6 +99,7 @@ class Player:
             self.on_ground = False
             self.last_jump_time = current_time  # Update last jump time
             self.update_rect()  # Update rect after changing y-position
+            self.jump_sound.play()
 
     def handle_collisions(self, platforms):
         self.on_ground = False
@@ -128,12 +133,13 @@ class Player:
             self.update_rect()
 
     def hanldeFlagCollision(self, flags):
-        if self.rect.colliderect(flags.rect):
-            flags.action = 'gotten'
-            if flags.collision is False:
-                self.score += 100
-                flags.collision = True
-            #self.flagCollision = True
+        for flag in flags:
+            if self.rect.colliderect(flag.rect):
+                flag.action = 'gotten'
+                if flag.collision is False:
+                    self.score += 100
+                    flag.collision = True
+                #self.flagCollision = True
             
             
 
